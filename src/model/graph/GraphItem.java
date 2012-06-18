@@ -1,0 +1,66 @@
+package model.graph;
+
+
+import java.util.HashMap;
+import java.util.Map;
+
+public abstract class GraphItem implements Named{
+    
+    final static int VERBOSE = 0;
+    final static int NONVERBOSE = 1;
+    
+    protected Map<String,Object> info;
+    protected String name;
+    protected Graph myGraph;
+    
+    GraphItem(String name,Graph myGraph){
+        info = new HashMap<String,Object>();
+        this.name = name;
+        this.myGraph = myGraph;
+    }
+    
+    public Object getInfo(String key) {
+        return info.get(key);
+    }
+    
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    void setName(String name) {
+        myGraph.updateVertexKey(this.name, name);
+        this.name = name;
+    }
+    
+    /**
+     * Adds the given data to the graph component under the given key.
+     */
+    public void addData(String key, Object value){
+        info.put(key, value);
+    }
+    
+    /**
+     * @return a String representation of this graph element, either in a
+     * verbose or non-verbose manner.
+     */
+    abstract public String toString(int style);
+    
+    /**
+     * @return the non-verbose variant of the toString method
+     */
+    @Override
+    public String toString(){
+        return toString(GraphItem.NONVERBOSE);
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+}
