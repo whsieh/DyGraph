@@ -1,0 +1,50 @@
+Note: feel free to edit any of these.
+
+I. Project overview
+
+DyGraph is a simple 2D graph visualization package. It is built in Java, deployed as an applet and registered as a Facebook app.
+
+With DyGraph, users can expect to:
+
+    [1] create a moderately-sized (~80+ vertices) graph consisting of their most relevant friends and connections.
+
+    [2] easily detect important “communities” among peers based not only on the Facebook
+     Networks each person belongs to, but also on the underlying structure of the graph. 
+
+    [3] (this is a less immediate goal) run several vertex-based graph algorithms such
+     as centrality measures, PageRank and clustering coefficient. Wouldn't it be cool if,
+     by using bigger vertices to represent friends with greater PageRank scores, one could
+     visually tell which one of their friends act as 'hubs' of communication in their
+     social networks?
+
+There are also a few things to keep in mind when developing this project:
+
+    [1] Less cluttering is more usability! While we probably won't be able to compete
+     with the functionality of TouchGraph, we should at least create an app that takes
+     a much simpler, user- driven approach. If possible, we shouldn't even have a
+     traditional file bar, tool box, etc. (or have only a subtle, semi-transparent icon
+     that expands when moused over).
+
+    [2] Make it work, then worry about making it optimal (I believe Knuth once said:
+     “Premature optimization is the root of all evil”).
+
+    This project should be ready for release by the end of 2 weeks—after the first week,
+     all of the separate modules should be complete; after the second week, all of the
+     modules should be combined, and all major bugs fixed.
+
+II. Modules/Tasks
+
+A. Web
+
+    - Web page: this will house the applet. Nothing too fancy here, just some HTML—
+     however, we will also need some Javascript in order to redirect to Facebook for
+     authentication, and then receive data from Facebook in the form of an access token
+     for this to be a proper Facebook app.
+
+    - SQL database: still trying to decide if we need this. Will be useful if users
+     want to save their graphs so they can be opened later. Let's hold off on this
+     until week 2.
+
+B. Java/JAR
+
+    - (in progress....)
