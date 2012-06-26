@@ -47,4 +47,12 @@ A. Web
 
 B. Java/JAR
 
-    - (in progress....)
+    VERY BRIEF DESCRIPTIONS:
+        - View: includes the GViewer panel, all Painter objects, etc.
+        - Model: includes the Graph data structure and all its component classes.
+        - Controller: ties the view with the model. Will also include/call upon classes and procedures necessary
+         to transform raw data extracted from Facebook into meaningful information that can go into vertices and
+         edges.
+    DETAILED DESCRIPTIONS:
+        
+    
