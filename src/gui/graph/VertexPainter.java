@@ -69,12 +69,12 @@ public class VertexPainter extends AbstractPainter implements MassController,Mou
         this.acceleration = new Vector2D(
                 0,0,Vector2D.CARTESIAN,Vector2D.ACCELERATION);
         this.curRegion = myTable.findRegion(new Point(x,y));
-        
+        /*
         try {
             image = ImageIO.read(new URL("http://25.media.tumblr.com/avatar_a6830c377220_16.png"));
         } catch (MalformedURLException ex) {
             Logger.getLogger(VertexPainter.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        } */
         
     }
     
@@ -166,15 +166,14 @@ public class VertexPainter extends AbstractPainter implements MassController,Mou
 
     @Override
     void paint(Graphics g) {
-        
+        /*
          g.drawImage(image,
                 x - RADIUS,
                 y - RADIUS,
                 myParent);
            g.drawString(label,x+RADIUS, y+RADIUS);
-         
+         */
         
-        /*
         Graphics2D g2d = (Graphics2D)g;
         
         Stroke s = g2d.getStroke();
@@ -194,7 +193,7 @@ public class VertexPainter extends AbstractPainter implements MassController,Mou
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
         RenderingHints.VALUE_ANTIALIAS_OFF);
         g2d.setStroke(s);
-        */
+        
     }
     
     @Override

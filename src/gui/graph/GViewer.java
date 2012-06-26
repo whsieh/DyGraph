@@ -42,7 +42,6 @@ public class GViewer extends JPanel {
     static int unit_mass = 400;
     
     boolean currentlyAddingEdge;
-    JFrame myFrame;
     InfoDisplay infoDisplay;
     
     CoordinateTable2D<VertexPainter> vertexTable;
@@ -57,7 +56,7 @@ public class GViewer extends JPanel {
     Graph graph;
     GController controller;
     
-    public GViewer(GController controller,JFrame frame){
+    public GViewer(GController controller){
         
         super();
         this.setFocusable(true);
@@ -65,7 +64,6 @@ public class GViewer extends JPanel {
         this.graph = new Graph("New Graph");
         this.controller = controller;
         this.currentlyAddingEdge = false;
-        this.myFrame = frame;
         this.bounds = new Rectangle(-DEFAULT_WIDTH*SCREEN_SIZE_MULT,
                 -DEFAULT_HEIGHT*SCREEN_SIZE_MULT,2*DEFAULT_WIDTH*SCREEN_SIZE_MULT,
                 2*DEFAULT_HEIGHT*SCREEN_SIZE_MULT);

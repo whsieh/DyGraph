@@ -11,6 +11,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import javax.swing.JApplet;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
@@ -32,7 +33,7 @@ public abstract class GController implements Runnable{
     }
     
     protected GViewer view;
-    protected JFrame root;
+    protected JApplet root;
     
     protected float repulsiveConstant = DEFAULT_REPULSIVE_CONST;
     protected float equilibriumLength = DEFAULT_EQUILIBRIUM_LENGTH;
@@ -40,13 +41,12 @@ public abstract class GController implements Runnable{
     
     
     
-    public GController() {
-        root = new JFrame("DyGraph test");
-        root.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        view = new GViewer(this,root);
+    public GController(JApplet root) {
+        this.root = root;
+        // root.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        view = new GViewer(this);
         root.setLayout(new GridLayout());
         root.add(view);
-        root.pack();
         root.setLocation(DEFAULT_WIDTH/6,DEFAULT_HEIGHT/6);
         root.setVisible(true);
         view.setLayout(null);

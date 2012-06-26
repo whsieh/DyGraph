@@ -3,7 +3,8 @@ package model.graph.exception;
 
 public class GraphException extends RuntimeException{
 
-    final static String TYPE = "Error: incorrect element type.";
+	private static final long serialVersionUID = 1L;
+	final static String TYPE = "Error: incorrect element type.";
     final static String IDENTIFIER = "Error: unknown identifier flag.";
     final static String DUPLICATE = "Error: duplicate items should not exist.";
     final static String NOTFOUND = "Error: element not found: ";

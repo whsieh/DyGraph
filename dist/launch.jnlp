@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<jnlp codebase="file:/C:/Documents%20and%20Settings/Admin/Desktop/DyGraph/dist/" href="launch.jnlp" spec="1.0+">
+    <information>
+        <title>DyGraph</title>
+        <vendor>Foo McTestbar</vendor>
+        <homepage href=""/>
+        <description>DyGraph</description>
+        <description kind="short">DyGraph</description>
+        
+        
+    <icon href="Apps-Notepad.ico" kind="default"/>
+<offline-allowed/>
+</information>
+    <update check="background"/>
+    
+    <resources>
+        <j2se java-vm-args="-Djava.security.policy=applet.policy" version="1.6+"/>
+        <jar href="DyGraph.jar" main="true"/>
+        
+        
+    <jar href="lib/restfb-1.6.9.jar"/>
+</resources>
+    <applet-desc height="600" main-class="web.WebLauncher" name="DyGraph" width="800">
+        
+    </applet-desc>
+</jnlp>

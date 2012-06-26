@@ -39,6 +39,7 @@ public class EdgePainter extends AbstractPainter implements SpringController,Mou
 
     
     public EdgePainter(GViewer graphPane,VertexPainter vp1, VertexPainter vp2,String label){
+        
         /* Initializing graph-related components */
         this.myParent = graphPane;
         this.vp1 = vp1;
@@ -46,13 +47,9 @@ public class EdgePainter extends AbstractPainter implements SpringController,Mou
         this.eqn = new LinearEqn2D(vp1.x,vp1.y,vp2.x,vp2.y);
         this.updateVertices();
         this.label = label;
+        
         /* Initializing physics-related components */
-        k = SpringController.DEFAULT_K;
-        //equilibrium = SpringController.DEFAULT_EQUILIBRIUM_LENGTH;
-        /*
-        equilibrium = Math.pow(Math.pow(vp2.x-vp1.x,2)+
-            Math.pow(vp2.y-vp1.y,2),0.5);
-       */
+        k = SpringController.DEFAULT_K; // Change to scale to edge weight.
         equilibrium = myParent.controller.equilibriumLength;
         currentLength = equilibrium;
     }
