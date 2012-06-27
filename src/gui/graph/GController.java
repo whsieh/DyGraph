@@ -16,9 +16,7 @@ import javax.swing.JFrame;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
-public abstract class GController implements Runnable{
-    
-    protected GPopulator gpop;
+public abstract class GController {
     
     protected static final float DEFAULT_REPULSIVE_CONST = (float)Math.pow(2,4);
     protected static final float DEFAULT_EQUILIBRIUM_LENGTH = 150;
@@ -39,7 +37,7 @@ public abstract class GController implements Runnable{
     protected float equilibriumLength = DEFAULT_EQUILIBRIUM_LENGTH;
     protected float unitMass = DEFAULT_UNIT_MASS;
     
-    
+    protected GPopulator gpop;
     
     public GController(JApplet root) {
         this.root = root;
@@ -55,6 +53,13 @@ public abstract class GController implements Runnable{
         view.infoDisplay.addKeyListener();
         view.infoDisplay.addIconListener();
         view.infoDisplay.addSliderListener();
+        
+        gpop = new GPopulator(view){
+            @Override
+            public void populate() {
+                // empty graph
+            }
+        };
     }
     
     public void setPopulator(GPopulator pop) {
@@ -264,8 +269,5 @@ public abstract class GController implements Runnable{
     }
     
     abstract public void launch();
-    
-    @Override
-    abstract public void run();
     
 }

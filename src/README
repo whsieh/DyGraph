@@ -35,7 +35,7 @@ There are also a few things to keep in mind when developing this project:
 
 II. Modules/Tasks
 
-    Web
+	Web
 
 	    - Web page: this will house the applet. Nothing too fancy here, just some HTML.
 	     However, we will also need some Javascript in order to redirect to Facebook for
@@ -118,6 +118,24 @@ II. Modules/Tasks
 	
 		I'll put more tasks as they come to my mind...again, feel free to change stuff around if you
 		that it doesn't make sense, just make sure you leave a note or remember what you changed.
+	
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     
