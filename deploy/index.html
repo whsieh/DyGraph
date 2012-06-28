@@ -1,0 +1,19 @@
+<html>
+    <head>
+        <title>Basic Applet Test</title>
+    </head>
+    <body>
+        <script src="http://java.com/js/deployJava.js"></script>
+        <script>
+            var attributes = {
+                code:       "web.WebLauncher",
+                archive:    "DyGraph.jar",
+                width:      "100%",
+                height:     "100%"
+            };
+            var parameters = {jnlp_href:"launch.jnlp"}; <!-- Applet Parameters -->
+            var version = "1.6"; <!-- Required Java Version -->
+            deployJava.runApplet(attributes, parameters, version);
+        </script>
+    </body>
+</html>
