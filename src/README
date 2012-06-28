@@ -107,13 +107,11 @@ II. Modules/Tasks
 		with a simple anti-aliased and rounded rectangular border with a color corresponding to the
 		state of the vertex.
 		
-		2b. We need to create an OptionsPainter class that extends AbstractPainter. The Options-
-		Painter should appear as a semi-transparent gray cog that is docked at some corner in the
-		user's screen. Mousing over the cog will cause the actual options panel to fade in. Keep
-		things simple--we are basically writing our own gui kit, but we don't have to do anything
-		complicated. Alternatively, if you think it's a better idea to use Swing and modify it in
-		some way to make it cleaner, go ahead. Just make sure it looks nice and clean (think Google).
-		Lightly colored, anti-aliased, rounded rectangular panels are your friend.
+		2b. We need to create an options pane similar to the current Control Pane, but not as obtrusive.
+		It should be something like a semi-transparent JPanel/JFrame that only appears after the user
+		mouses over an icon (e.g. a transparent picture of a cog). The panel should fade into view over
+		the course of about 0.5 seconds, and fade out of view when the user's mouse leaves the panel.
+		Subtleness will be key in the UI design. We want to keep things simple and clean.
 	
 	
 		I'll put more tasks as they come to my mind...again, feel free to change stuff around if you
