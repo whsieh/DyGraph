@@ -14,13 +14,8 @@ import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.imageio.ImageIO;
 import util.dict.CoordinateTable2D;
 import util.list.InvalidNodeException;
 import util.list.ListNode;
@@ -207,7 +202,7 @@ public class VertexPainter extends AbstractPainter implements MassController,Mou
         if (state == SELECTED || myEdges.isEmpty()) {
             return 0;
         }
-        return myParent.controller.unitMass * myEdges.size();
+        return myParent.controller.unitMass;
     }
 
     @Override

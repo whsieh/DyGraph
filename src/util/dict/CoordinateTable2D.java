@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class CoordinateTable2D<V>{
     
-    static final public int DIM = 54;
+    static final public int DIM = 24;
     
     int size;
     int dim;

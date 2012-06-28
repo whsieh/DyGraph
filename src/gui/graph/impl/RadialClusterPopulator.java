@@ -2,8 +2,6 @@ package gui.graph.impl;
 
 import gui.graph.*;
 import gui.graph.util.IDCounter;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class RadialClusterPopulator extends GPopulator {
 
@@ -29,11 +27,6 @@ public class RadialClusterPopulator extends GPopulator {
                         "#"+IDCounter.next(),(int)(Math.random()*800),
                 (int)(Math.random()*800));
                 view.addEdge(anchors[anch],clusters[anch][clust]);
-                try {
-                    Thread.sleep(250);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(GViewer.class.getName()).log(Level.SEVERE, null, ex);
-                }
             }
             if (anch != 0) {
                 view.addEdge(anchors[anch],anchors[anch-1]);

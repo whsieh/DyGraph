@@ -51,6 +51,8 @@ public class GViewer extends JPanel {
     
     int curX;
     int curY;
+    long prevArrowEvent;
+    int arrowEventCount;
     
     Rectangle bounds;
     Graph graph;
@@ -100,7 +102,7 @@ public class GViewer extends JPanel {
         WHITESPACE_MENUITEMS[0].addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                addVertex("testing",popupX,popupY);
+                addVertex("#" + IDCounter.next(),popupX,popupY);
             }
         });
         
@@ -208,6 +210,46 @@ public class GViewer extends JPanel {
             vp.moveTo(vp.x+deltaX,vp.y+deltaY);
         }
         infoDisplay.setLocation(infoDisplay.getX()+deltaX,infoDisplay.getY()+deltaY);
+    }
+    
+    public void dragView(KeyEvent e){
+        
+        long delay = e.getWhen() - prevArrowEvent;        
+        prevArrowEvent = e.getWhen();
+        if (delay < 100) {
+            arrowEventCount += 1;
+        } else {
+            arrowEventCount = 0;
+        }
+        int amount = arrowEventCount + 2;
+        switch(e.getKeyCode()) {
+            case KeyEvent.VK_RIGHT:
+                for(VertexPainter vp : vertexList){
+                    vp.moveTo(vp.x-amount,vp.y);
+                }
+                infoDisplay.setLocation(infoDisplay.getX()-amount,infoDisplay.getY());
+                break;
+            case KeyEvent.VK_LEFT:
+                for(VertexPainter vp : vertexList){
+                    vp.moveTo(vp.x+amount,vp.y);
+                }
+                infoDisplay.setLocation(infoDisplay.getX()+amount,infoDisplay.getY());
+                break;
+            case KeyEvent.VK_DOWN:
+                for(VertexPainter vp : vertexList){
+                    vp.moveTo(vp.x,vp.y-amount);
+                }
+                infoDisplay.setLocation(infoDisplay.getX(),infoDisplay.getY()-amount);
+                break;
+            case KeyEvent.VK_UP:
+                for(VertexPainter vp : vertexList){
+                    vp.moveTo(vp.x,vp.y+amount);
+                }
+                infoDisplay.setLocation(infoDisplay.getX(),infoDisplay.getY()+amount);
+                break;
+            default:
+                break;            
+        }
     }
     
     public VertexPainter locateVertexPainter(int x, int y) {

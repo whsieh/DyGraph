@@ -12,7 +12,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import javax.swing.JApplet;
-import javax.swing.JFrame;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
@@ -204,7 +203,7 @@ public abstract class GController {
     public void handleMouseDragged(MouseEvent e) {
         view.requestFocus();
         if (e.isShiftDown()) {
-            /* TODO: IMPLEMENT MULTIPLE SELECTION */        
+            /* TODO : IMPLEMENT MULTIPLE SELECTION */        
         } else {
             VertexPainter node = view.locateVertexPainter(e.getX(),e.getY());
             if (view.currentlyDragged != null) {

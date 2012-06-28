@@ -4,7 +4,7 @@ import util.misc.Vector2D;
 
 public interface SpringController {
    
-   final static float DEFAULT_K = 0.025f;
+   final static float DEFAULT_K = 0.03f;
    
    public float k();
    
