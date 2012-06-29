@@ -28,7 +28,7 @@ abstract class AbstractPainter {
     
     abstract void inform(Message message, Data e);
 
-    void setState(int state){
+    void setState(int state){ 
         this.state = state;
     }
     

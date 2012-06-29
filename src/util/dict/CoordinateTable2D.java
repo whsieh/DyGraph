@@ -134,7 +134,7 @@ public class CoordinateTable2D<V>{
     }
 
     public V remove(Point key) {
-        try{
+        try {
             Point region = findRegion(key);
             if (buckets[region.x][region.y] == null) {
                 return null;
@@ -147,7 +147,7 @@ public class CoordinateTable2D<V>{
                 }
             }
             return null;
-        }catch(IndexOutOfBoundsException e) {
+        } catch (IndexOutOfBoundsException e) {
             System.err.println("You have clipped through the edge of the"
                     + " graph panel. Java will pretend it saw nothing :)");
             return null;

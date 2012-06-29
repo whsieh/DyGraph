@@ -1,6 +1,4 @@
-*.class
-*.properties
-*.policy
-build.xml
-.nbproject/
-.dist/
+*.classpath
+*.project
+..metadata/
+.bin/
