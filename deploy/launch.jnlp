@@ -1,25 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<jnlp href="launch.jnlp" spec="1.0+">
-    <information>
-        <title>DyGraph</title>
-        <vendor>(Placeholder)</vendor>
-        <homepage href=""/>
-        <description>Graph Visualization Applet</description>
-        <description kind="short">Graph Visualization Applet</description>
-        
-        
-    <icon href="Apps-Notepad.ico" kind="default"/>
-<offline-allowed/>
-</information>
-    <update check="background"/>
-    
-    <resources>
-        <j2se version="1.6+"/>
-        <jar href="DyGraph.jar" main="true"/>
-        
-        
-    </resources>
-    <applet-desc height="600" main-class="web.WebLauncher" name="DyGraph" width="800">
-        
-    </applet-desc>
+<jnlp codebase="http://dygraph.herobo.com/" href="launch.jnlp" spec="1.0+">
+	<information>
+		<title>DyGraph</title>
+		<vendor>(Placeholder)</vendor>
+		<homepage href=""/>
+		<description>Graph Visualization Applet</description>
+		<description kind="short">Graph Visualization Applet</description>
+		<icon href="Apps-Notepad.ico" kind="default"/>
+		<offline-allowed/>
+	</information>
+	<update check="background"/>
+	<resources>
+		<j2se version="1.6+"/>
+		<jar href="DyGraph.jar" main="true"/>	
+	</resources>
+    <applet-desc height="600" main-class="web.WebLauncher" name="DyGraph" width="800"></applet-desc>
 </jnlp>

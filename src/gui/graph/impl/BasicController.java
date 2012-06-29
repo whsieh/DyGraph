@@ -25,7 +25,7 @@ public class BasicController extends GController{
 
     @Override
     public void launch() {
-        this.setPopulator(new RadialClusterPopulator(view,50,4));
+        this.setPopulator(new RadialClusterPopulator(view,25,4));
         view.activate();
     }
 }
