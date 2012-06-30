@@ -1,5 +1,6 @@
 *.classpath
 *.project
 *.class
+Thumbs.db
 ..metadata/
 .bin/

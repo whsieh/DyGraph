@@ -1,0 +1,142 @@
+Note: feel free to edit any of these.
+
+I. Project overview
+
+DyGraph is a simple 2D graph visualization package. It is built in Java, deployed
+as an applet and registered as a Facebook app.
+
+With DyGraph, users can expect to:
+
+    [1] create a moderately-sized (~80+ vertices) graph consisting of their most relevant friends and connections.
+
+    [2] easily detect important "communities" among peers based not only on the Facebook
+     Networks each person belongs to, but also on the underlying structure of the graph. 
+
+    [3] (this is a less immediate goal) run several vertex-based graph algorithms such
+     as centrality measures, PageRank and clustering coefficient. Wouldn't it be cool if,
+     by using bigger vertices to represent friends with greater PageRank scores, one could
+     visually tell which one of their friends act as 'hubs' of communication in their
+     social networks?
+
+There are also a few things to keep in mind when developing this project:
+
+    [1] Less cluttering is more usability! While we probably won't be able to compete
+     with the functionality of TouchGraph, we should at least create an app that takes
+     a much simpler, user- driven approach. If possible, we shouldn't even have a
+     traditional file bar, tool box, etc. (or have only a subtle, semi-transparent icon
+     that expands when moused over).
+
+    [2] Make it work, then worry about making it optimal (I believe Knuth once said:
+     "Premature optimization is the root of all evil").
+
+    This project should be ready for release by the end of 2 weeks--after the first week,
+     all of the separate modules should be complete; after the second week, all of the
+     modules should be combined, and all major bugs fixed.
+
+II. Modules/Tasks
+
+	Web
+
+	    - Web page: this will house the applet. Nothing too fancy here, just some HTML.
+	     However, we will also need some Javascript in order to redirect to Facebook for
+	     authentication, and then receive data from Facebook in the form of an access token
+	     for this to be a proper Facebook app.
+
+	    - SQL database: still trying to decide if we need this. Will be useful if users
+	     want to save their graphs so they can be opened later. Let's hold off on this
+	     until week 2.
+
+	Java/JAR
+
+	    VERY BRIEF DESCRIPTIONS:
+	    
+		- View: includes the GViewer panel, all Painter objects, etc.
+		- Model: includes the Graph data structure and all its component classes.
+		- Controller: ties the view with the model. Will also include/call upon 
+		 classes and procedures necessary to transform raw data extracted from
+		 Facebook into meaningful information that can go into vertices and edges.
+		 
+	    (somewhat more) DETAILED DESCRIPTIONS:
+	    
+		- AbstractPainter: represents an abstract component that is contained
+		 within a GViewer. It can be informed of events by receiving a Message and
+		 corresponding Data (which can be null, depending on the type of message).
+		 In addition, it is always in one of three states: default, focused (i.e.
+		 mouseover) and selected (clicked). It also has a paint method, invoked by
+		 the upper-level GViewer.
+		- EdgePainter: represents an undirected edge between two vertices. Its paint
+		 method simply draws an anti-aliased line by default. In order to determine
+		 whether the user's mouse is contained in the edge, it uses a linear equation.
+		- VertexPainter: represents a vertex. Its paint method simply draws an anti-
+		 aliased circle
+		- GViewer: a top-level container that contains EdgePainters and VertexPainters.
+		 Also currently includes an InfoDisplay, which is only for testing and should
+		 be removed in the final version and replaced by a cleaner UI setup. GViewer
+		 queries a Graph for data regarding vertices and edges.
+		
+		- MassController: provides the simple interface for an interactive object
+		 with a mass. It is meant to be used alongside SpringControllers.
+		- SpringController: provides the simple interface for an interactive object
+		 that causes forces governed by Hooke's law. It is meant to connect two
+		 SpringControllers.
+		- PhysicsController: provides the interface to run a physics cycle in a
+		 simulation. It is meant to calculate forces and dispacements given Mass-
+		 Controllers and SpringControllers.
+		
+		- GController: wraps a GViewer by setting its desired behaviors when receiving
+		 user input. Namely, adds listeners to the panel.
+		- GPopulator: populates a GViewer with vertices and edges.
+	
+	    TASKS:
+	    
+		1a. We need a FacebookGraphAdapter class that can take abstract data extracted from FB
+		posts and adapt it to fit a form that Vertices and Edges will understand. I recommend
+		that FacebookGraphAdapter has a public method that takes in a list of Post objects 
+		(see the RestFB API) and outputs VertexInformation and EdgeInformation objects, which
+		act as 'messengers' that contain all the relevant information to construct a new Vertex
+		representing a profile on Facebook or a new Edge representing communication between two
+		Facebook users.
+		
+		1b. To get the Post objects to FacebookGraphAdapter in the first place, we should also
+		have a utility class named FacebookFeedExtractor that contains static methods necessary
+		to start at the access code and Facebook user ID and end at a collection of Post objects
+		representing Facebook posts.
+		
+		2a. We need to create a ProfilePainter class that extends VertexPainter and overrides the
+		paint methods. Instead of a simple circle, we need to paint a Facebook user's icon bordered
+		with a simple anti-aliased and rounded rectangular border with a color corresponding to the
+		state of the vertex.
+		
+		2b. We need to create an options pane similar to the current Control Pane, but not as obtrusive.
+		It should be something like a semi-transparent JPanel/JFrame that only appears after the user
+		mouses over an icon (e.g. a transparent picture of a cog). The panel should fade into view over
+		the course of about 0.5 seconds, and fade out of view when the user's mouse leaves the panel.
+		Subtleness will be key in the UI design. We want to keep things simple and clean.
+	
+	
+		I'll put more tasks as they come to my mind...again, feel free to change stuff around if you
+		think that it doesn't make sense, just make sure you leave a note or remember what you changed.
+	
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

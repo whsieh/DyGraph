@@ -1,0 +1,37 @@
+<html>
+    <head>
+        <title>Redirecting...</title>
+    </head>
+    <body>
+	    <script type="text/javascript">
+        	/* The function getFromURI extracts and returns the parameter 
+        	 * corresponding to the input name binding passed into the URI
+        	 */
+	    	function getFromURI(name) {
+	        	name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+	        	var regexS = "[\\?&]"+name+"=([^&#]*)";
+	        	var regex = new RegExp( regexS );
+	        	var results = regex.exec( window.location.href );
+	        	if (results == null)
+	            	return null;
+	        	else
+	            	return results[1]
+	        }
+			var code = getFromURI('code');
+	        /* Next, make a server-side request to exchange the generated
+	         * code for an access token.
+	         */
+     		function httpGet(theUrl) {
+	     	    var xmlHttp = null;
+	     	    xmlHttp = new XMLHttpRequest();
+	     	    xmlHttp.open( "GET", theUrl, false );
+	     	    xmlHttp.send( null );
+	     	    return xmlHttp.responseText;
+     	    }
+	        if (code != null) {
+        		var params = httpGet("https://graph.facebook.com/oauth/access_token?client_id=484669298217310&redirect_uri=http://dygraph.herobo.com/redirect.html&client_secret=62fe51d623b90a2367a579353f0037d8&code="+code);
+        		window.location = "http://dygraph.herobo.com/applet.html?" + params;
+	        }
+         </script>
+    </body>
+</html>

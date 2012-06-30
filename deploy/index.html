@@ -1,19 +1,10 @@
 <html>
     <head>
-        <title>Basic Applet Test</title>
+        <title>Login with Facebook</title>
     </head>
     <body>
-        <script src="http://java.com/js/deployJava.js"></script>
-        <script>
-            var attributes = {
-                code:       "web.WebLauncher",
-                archive:    "DyGraph.jar",
-                width:      "100%",
-                height:     "100%"
-            };
-            var parameters = {jnlp_href:"launch.jnlp"}; <!-- Applet Parameters -->
-            var version = "1.6"; <!-- Required Java Version -->
-            deployJava.runApplet(attributes, parameters, version);
-        </script>
+    	<script type="text/javascript">
+			window.location = "https://www.facebook.com/dialog/oauth?client_id=484669298217310&redirect_uri=http://dygraph.herobo.com/redirect.html&scope=read_stream,read_friendlists&state=default";
+    	</script>
     </body>
 </html>

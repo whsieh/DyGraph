@@ -10,8 +10,11 @@ public class WebLauncher extends JApplet{
     
     @Override
     public void init() {
-        c = new BasicController(this);
-        c.launch();
+    	String accessToken = getParameter("access_token");
+    	if (accessToken.length() > 20) {
+	        c = new BasicController(this);
+	        c.launch();
+    	}
     }
     
     @Override
