@@ -46,7 +46,7 @@ public class EdgePainter extends AbstractPainter implements SpringController,Mou
         this.vp2 = vp2;
         this.eqn = new LinearEqn2D(vp1.x,vp1.y,vp2.x,vp2.y);
         this.updateVertices();
-        this.label = label;
+        this.id = label;
         
         /* Initializing physics-related components */
         k = SpringController.DEFAULT_K; // Change to scale to edge weight.

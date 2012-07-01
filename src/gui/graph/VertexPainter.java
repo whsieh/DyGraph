@@ -1,8 +1,9 @@
 package gui.graph;
 
-import gui.graph.util.Message;
 import gui.graph.physics.MassController;
 import gui.graph.util.Data;
+import gui.graph.util.Message;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -15,6 +16,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+
 import util.dict.CoordinateTable2D;
 import util.list.InvalidNodeException;
 import util.list.ListNode;
@@ -28,10 +30,10 @@ public class VertexPainter extends AbstractPainter implements MassController,Mou
         {Color.WHITE,Color.BLUE},
         {Color.WHITE,Color.RED},
     };
-
+	
     /* Graph-related components */
-    ListNode myListNode;
-    CoordinateTable2D myTable;
+    ListNode<VertexPainter> myListNode;
+    CoordinateTable2D<VertexPainter> myTable;
     List<EdgePainter> myEdges;
     int x;
     int y;
@@ -43,7 +45,7 @@ public class VertexPainter extends AbstractPainter implements MassController,Mou
     Vector2D velocity;
     Vector2D acceleration;
     
-    VertexPainter(GViewer graphPane,int xPos, int yPos,String label) throws IOException {
+    VertexPainter(GViewer graphPane,int xPos, int yPos,String id) throws IOException {
         
         /* Initialize graph-related components */
         this.state = 0;
@@ -53,7 +55,7 @@ public class VertexPainter extends AbstractPainter implements MassController,Mou
         this.myListNode = null;
         this.myEdges = new CopyOnWriteArrayList<EdgePainter>();
         this.myTable = graphPane.vertexTable;
-        this.label = label;
+        this.id = id;
         
         /* Initialize physics-related components */
         this.position = new Vector2D(
@@ -153,7 +155,7 @@ public class VertexPainter extends AbstractPainter implements MassController,Mou
 
     @Override
     void paint(Graphics g) {
-
+    	
         Graphics2D g2d = (Graphics2D)g;
         
         Stroke s = g2d.getStroke();
@@ -169,7 +171,7 @@ public class VertexPainter extends AbstractPainter implements MassController,Mou
         g2d.setStroke(new BasicStroke(4));
         g2d.drawOval(x - RADIUS,
                 y - RADIUS, 2*(RADIUS), 2*(RADIUS));
-        g2d.drawString(label,x+RADIUS, y);
+        g2d.drawString(id,x+RADIUS, y);
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
         RenderingHints.VALUE_ANTIALIAS_OFF);
         g2d.setStroke(s);
@@ -178,7 +180,7 @@ public class VertexPainter extends AbstractPainter implements MassController,Mou
     
     @Override
     public String toString() {
-        String s = label + " @(" + x + "," + y + ")";
+        String s = id + " @(" + x + "," + y + ")";
         return s;
     }
 

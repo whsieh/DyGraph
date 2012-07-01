@@ -1,26 +1,26 @@
 
 package gui.graph.util;
 
-public class Data <S,I> {
+public class Data {
 
-    S source;
-    I info;
+    Object source;
+    Object info;
 
-    public Data(S source, I info){
+    public Data(Object source, Object info){
         this.source = source;
         this.info = info;
     }
 
-    public Data(I info){
+    public Data(Object info){
         this.source = null;
         this.info = info;
     }
     
-    public S source() {
+    public Object source() {
         return source;
     }
     
-    public I info() {
+    public Object info() {
         return info;
     }
     

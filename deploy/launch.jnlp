@@ -6,7 +6,7 @@
 		<homepage href=""/>
 		<description>Graph Visualization Applet</description>
 		<description kind="short">Graph Visualization Applet</description>
-		<icon href="Apps-Notepad.ico" kind="default"/>
+		<icon href="logo_icon.ico" kind="default"/>
 		<offline-allowed/>
 	</information>
 	<update check="background"/>

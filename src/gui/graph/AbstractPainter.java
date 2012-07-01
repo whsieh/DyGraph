@@ -20,7 +20,7 @@ abstract class AbstractPainter {
     
     int state;
     GViewer myParent;
-    String label;
+    String id;
     
     abstract boolean contains(int x, int y);
     

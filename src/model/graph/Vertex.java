@@ -9,22 +9,22 @@ public class Vertex extends GraphItem implements Iterable<Edge>{
 
     Map<Vertex,Edge> edges;
     
-    protected Vertex(String name,Graph myGraph){
-        super(name,myGraph);
+    protected Vertex(String id,Graph myGraph){
+        super(id,myGraph);
         edges = new ConcurrentHashMap<Vertex,Edge>();
-    }
-    
-    protected void addEdge(String name,Vertex v,Edge e) {
-        if (edges.get(v) == null) {
-            edges.put(v,e);
-        } else {
-            throw GraphException.duplicate();
-        }
     }
     
     protected void disconnect() {
         for (Edge e : edges.values()) {
-            myGraph.removeEdge(e.name);
+            myGraph.removeEdge(e.id);
+        }
+    }    
+    
+    protected void addEdge(Vertex v,Edge e) {
+        if (edges.get(v) == null) {
+            edges.put(v,e);
+        } else {
+            throw GraphException.duplicate();
         }
     }
     
@@ -38,9 +38,9 @@ public class Vertex extends GraphItem implements Iterable<Edge>{
     @Override
     public String toString(int style) {
         if (style == GraphItem.VERBOSE) {
-            return "Vertex: " + name;
+            return "Vertex: " + id;
         } else if (style == GraphItem.NONVERBOSE){
-            return "V<" + name + ">";
+            return "V<" + id + ">";
         } else {
             throw GraphException.identifier();
         }

@@ -19,7 +19,7 @@ public class FacebookFeedQuerying {
         
         /* Go to https://developers.facebook.com/tools/explorer to get an updated access token with extended permissions to read friendlists
          and read stream. The one below is expired. This procedure will be used for testing until the proper redirect scripts are in place. */
-        String ACCESS_TOKEN = "AAACEdEose0cBAL4NmJBaWraFY0XIow1fiaSbVh2M4QhxxP1UzHDZAbGXMpZCg0ZCuX6ZAMRHkr7uVDWWcFMmSKP714PHZCSjzVbBFNvLEboreGa7rQNuN";
+        String ACCESS_TOKEN = "AAAG4zd1akV4BAM3cloZB8GZAW13k5XfvN1qOhXBIHhLv6QeRi6eePs0uTXPiwdk7MvGSazZBzR85ibJRgIMyjS4NAwqRXvPDzHPuorRGiG5exMn391p";
         FacebookClient fb = new DefaultFacebookClient(ACCESS_TOKEN);
         int MAX_TIME_MS = 5000;
 
@@ -38,6 +38,7 @@ public class FacebookFeedQuerying {
                     }
                     System.out.println("Time: " + post.getCreatedTime() + "\n");					
                 }
+                System.out.println("NEXT WALL --->");
                 if (System.currentTimeMillis() - starttime > MAX_TIME_MS) {
                     System.out.println("TIME IS UP!!!");
                     break query;

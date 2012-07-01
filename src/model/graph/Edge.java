@@ -23,8 +23,8 @@ public class Edge extends GraphItem {
     }
     
     private void updateVertices() {
-        v1.addEdge(name, v2, this);
-        v2.addEdge(name, v1, this);
+        v1.addEdge(v2, this);
+        v2.addEdge(v1, this);
     }
     
     /**

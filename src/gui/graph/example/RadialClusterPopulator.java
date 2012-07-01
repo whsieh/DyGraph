@@ -1,4 +1,4 @@
-package gui.graph.impl;
+package gui.graph.example;
 
 import gui.graph.*;
 import gui.graph.util.IDCounter;

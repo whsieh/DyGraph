@@ -1,4 +1,4 @@
-package gui.graph.impl;
+package gui.graph.example;
 
 import gui.graph.GController;
 import java.awt.event.KeyEvent;

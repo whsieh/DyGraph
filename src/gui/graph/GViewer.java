@@ -266,13 +266,13 @@ public class GViewer extends JPanel {
     }
     
     void removeVertex(VertexPainter vp) {
-        if (graph.removeVertex(vp.label) != null) {
+        if (graph.removeVertex(vp.id) != null) {
             vp.remove();
         }
     }
     
     void removeEdge(EdgePainter ep) {
-        if (graph.removeEdge(ep.label) != null) {
+        if (graph.removeEdge(ep.id) != null) {
             ep.remove();
         }
     }
@@ -293,8 +293,8 @@ public class GViewer extends JPanel {
     
     public EdgePainter addEdge(VertexPainter vp1, VertexPainter vp2){
         try {
-            String eName = "<" + vp1.label + "," + vp2.label + ">";
-            graph.addEdge(eName, vp1.label,vp2.label,Edge.UNDIRECTED);
+            String eName = "<" + vp1.id + "," + vp2.id + ">";
+            graph.addEdge(eName, vp1.id,vp2.id,Edge.UNDIRECTED);
             EdgePainter e = new EdgePainter(this,vp1,vp2,eName);
             edgeList.insertBack(e);
             e.myListNode = edgeList.back();

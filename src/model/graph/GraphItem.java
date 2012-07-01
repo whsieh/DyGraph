@@ -10,12 +10,12 @@ public abstract class GraphItem implements Named{
     final static int NONVERBOSE = 1;
     
     protected Map<String,Object> info;
-    protected String name;
+    protected String id;
     protected Graph myGraph;
     
-    GraphItem(String name,Graph myGraph){
+    GraphItem(String id,Graph myGraph){
         info = new HashMap<String,Object>();
-        this.name = name;
+        this.id = id;
         this.myGraph = myGraph;
     }
     
@@ -25,12 +25,12 @@ public abstract class GraphItem implements Named{
     
     @Override
     public String getName() {
-        return name;
+        return id;
     }
 
-    void setName(String name) {
-        myGraph.updateVertexKey(this.name, name);
-        this.name = name;
+    void setName(String id) {
+        myGraph.updateVertexKey(this.id, id);
+        this.id = id;
     }
     
     /**
