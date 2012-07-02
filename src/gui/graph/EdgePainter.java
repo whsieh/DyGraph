@@ -114,8 +114,7 @@ public class EdgePainter extends AbstractPainter implements SpringController,Mou
         return s;
     }
 
-    @Override
-    void paint(Graphics g) {
+    private void paintLine(Graphics g, Color c) {
 
         Graphics2D g2d = (Graphics2D)g;
         
@@ -125,7 +124,7 @@ public class EdgePainter extends AbstractPainter implements SpringController,Mou
         Stroke origStroke = ((Graphics2D)g).getStroke();
         Color origColor = g.getColor();
         
-        g.setColor(EDGE_COLORS[state]);
+        g.setColor(c);
         g2d.setStroke(new BasicStroke(3));
         
         g.drawLine(vp1.x,vp1.y,vp2.x,vp2.y);
@@ -193,6 +192,21 @@ public class EdgePainter extends AbstractPainter implements SpringController,Mou
                     + "listnode reference.");
         }
     }
+
+	@Override
+	void paintDefault(Graphics g) {
+		paintLine(g, EDGE_COLORS[AbstractPainter.DEFAULT]);
+	}
+
+	@Override
+	void paintFocused(Graphics g) {
+		paintLine(g, EDGE_COLORS[AbstractPainter.FOCUSED]);
+	}
+
+	@Override
+	void paintSelected(Graphics g) {
+		paintLine(g, EDGE_COLORS[AbstractPainter.SELECTED]);
+	}
 
     
 }

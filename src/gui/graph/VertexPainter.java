@@ -155,20 +155,26 @@ public class VertexPainter extends AbstractPainter implements MassController,Mou
     
 	@Override
 	void paintDefault(Graphics g) {
-		// Unnecessary in this context.
+		Graphics2D g2d = (Graphics2D)g;
+		paintCircularVertex(g2d,STATE_COLORS[AbstractPainter.DEFAULT][0],
+				STATE_COLORS[AbstractPainter.DEFAULT][1]);
 	}   
 
 	@Override
 	void paintFocused(Graphics g) {
-		// Unnecessary in this context.
+		Graphics2D g2d = (Graphics2D)g;
+		paintCircularVertex(g2d,STATE_COLORS[AbstractPainter.FOCUSED][0],
+				STATE_COLORS[AbstractPainter.FOCUSED][1]);
 	}   
 
 	@Override
 	void paintSelected(Graphics g) {
-		// Unnecessary in this context.
+		Graphics2D g2d = (Graphics2D)g;
+		paintCircularVertex(g2d,STATE_COLORS[AbstractPainter.SELECTED][0],
+				STATE_COLORS[AbstractPainter.SELECTED][1]);
 	}
 	
-	private void paintCircularVertex(Graphics2D g2d,Color cOuter,Color cInner) {
+	private void paintCircularVertex(Graphics2D g2d,Color cInner,Color cOuter) {
         
         Stroke s = g2d.getStroke();
         

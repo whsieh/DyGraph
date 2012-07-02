@@ -13,7 +13,7 @@ public class WebLauncher extends JApplet{
     
 	final static int DEFAULT_WIDTH = 1600;
 	final static int DEFAULT_HEIGHT = 900;
-	final static String DEBUG_TOKEN = "AAACEdEose0cBAHVgr4qlHSx77Ay0jAd3fe03nevpyi3PgkHEwxk82Yl49IZBpEPrrAbgGDmNwVK4XJ2mVlO1fUmNhFeTPH14TZBJsZBIfeiftqXOuB7";
+	final static String DEBUG_TOKEN = "AAACEdEose0cBACKhebNmjTMqgsjMddomqhKxKl7SBK24HZByckeS8A2ELjpp1MblZBZAWQtZCMlvOfzjStlICc84jJsImc7lHs1BmYkZC0Evtq5ccGshj";
 	
     BasicController c;
     
