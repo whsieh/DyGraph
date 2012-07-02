@@ -96,12 +96,14 @@ II. Modules/Tasks
 		act as 'messengers' that contain all the relevant information to construct a new Vertex
 		representing a profile on Facebook or a new Edge representing communication between two
 		Facebook users.
-		
+		[In progress: see dygraph.FacebookQueryEngine]
+
 		1b. To get the Post objects to FacebookGraphAdapter in the first place, we should also
 		have a utility class named FacebookFeedExtractor that contains static methods necessary
 		to start at the access code and Facebook user ID and end at a collection of Post objects
 		representing Facebook posts.
-		
+		[In progress: see dygraph.FacebookUtil]
+
 		2a. We need to create a ProfilePainter class that extends VertexPainter and overrides the
 		paint methods. Instead of a simple circle, we need to paint a Facebook user's icon bordered
 		with a simple anti-aliased and rounded rectangular border with a color corresponding to the
