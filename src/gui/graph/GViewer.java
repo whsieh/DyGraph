@@ -15,10 +15,13 @@ import model.graph.Edge;
 import util.dict.CoordinateTable2D;
 import util.misc.Vector2D;
 
-
+// TODO Write methods that add data into the graph model and can request data
+// from the graph model. This kind of ganks standard MVC framework by making the
+// controller talk to the view and the view talk to the model, but it should
+// be enough to keep our project clean and organized.
 
 public class GViewer extends JPanel {
-    
+	
     static final boolean MOUSE_EVENT_TESTING = false;
     static final boolean PHYSICS_TESTING = false;
     static final boolean VERTEXTABLE_TESTING = true;

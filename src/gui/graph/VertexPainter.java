@@ -24,28 +24,27 @@ import util.misc.Vector2D;
 
 public class VertexPainter extends AbstractPainter implements MassController,MouseContainer {
     
-    final static int RADIUS = 12;
-    final static Color[][] STATE_COLORS = new Color[][] {
+	protected final static int RADIUS = 12;
+	protected final static Color[][] STATE_COLORS = new Color[][] {
         {Color.WHITE,Color.DARK_GRAY},
         {Color.WHITE,Color.BLUE},
         {Color.WHITE,Color.RED},
     };
 	
     /* Graph-related components */
-    ListNode<VertexPainter> myListNode;
-    CoordinateTable2D<VertexPainter> myTable;
-    List<EdgePainter> myEdges;
-    int x;
-    int y;
-    Point curRegion;
-    BufferedImage image;
+    protected ListNode<VertexPainter> myListNode;
+    protected CoordinateTable2D<VertexPainter> myTable;
+    protected List<EdgePainter> myEdges;
+    protected int x;
+    protected int y;
+    protected Point curRegion;
     
     /* Physics-related components */
-    Vector2D position;
-    Vector2D velocity;
-    Vector2D acceleration;
+    protected Vector2D position;
+    protected Vector2D velocity;
+    protected Vector2D acceleration;
     
-    VertexPainter(GViewer graphPane,int xPos, int yPos,String id) throws IOException {
+    protected VertexPainter(GViewer graphPane,int xPos, int yPos,String id) {
         
         /* Initialize graph-related components */
         this.state = 0;
@@ -104,7 +103,7 @@ public class VertexPainter extends AbstractPainter implements MassController,Mou
     }
 
     
-    void remove() {
+    protected void remove() {
         myParent.vertexTable.remove(new Point(x,y));
         try{
             for (EdgePainter ep : myEdges) {
@@ -117,7 +116,7 @@ public class VertexPainter extends AbstractPainter implements MassController,Mou
         }
     }
     
-    void moveTo(int xPos, int yPos) {
+    protected void moveTo(int xPos, int yPos) {
         Point old_p = new Point(x,y);
         Point new_p = new Point(xPos,yPos);
         if (myParent.bounds.contains(new_p)) {
@@ -134,16 +133,16 @@ public class VertexPainter extends AbstractPainter implements MassController,Mou
         }
     }
     
-    void moveTo(Vector2D pos) {
+    protected void moveTo(Vector2D pos) {
         moveTo((int)pos.x() + x,(int)pos.y() + y);
     }
     
-    void moveTo(Point p) {
+    protected void moveTo(Point p) {
         moveTo(p.x,p.y);
     }
     
     @Override
-    boolean contains(int x, int y) {
+    protected boolean contains(int x, int y) {
         return Math.pow(this.x - x, 2) +
                 Math.pow(this.y - y, 2) <=
                 VertexPainter.RADIUS * VertexPainter.RADIUS;
@@ -152,22 +151,35 @@ public class VertexPainter extends AbstractPainter implements MassController,Mou
     public boolean contains(Point p) {
         return contains(p.x,p.y);
     }
+    
+    
+	@Override
+	void paintDefault(Graphics g) {
+		// Unnecessary in this context.
+	}   
 
-    @Override
-    void paint(Graphics g) {
-    	
-        Graphics2D g2d = (Graphics2D)g;
+	@Override
+	void paintFocused(Graphics g) {
+		// Unnecessary in this context.
+	}   
+
+	@Override
+	void paintSelected(Graphics g) {
+		// Unnecessary in this context.
+	}
+	
+	private void paintCircularVertex(Graphics2D g2d,Color cOuter,Color cInner) {
         
         Stroke s = g2d.getStroke();
         
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
         RenderingHints.VALUE_ANTIALIAS_ON);
         
-        g2d.setColor(STATE_COLORS[state][0]);
+        g2d.setColor(cInner);
         g2d.fillOval(x - RADIUS,
                 y - RADIUS, 2*(RADIUS), 2*(RADIUS));
         
-        g2d.setColor(STATE_COLORS[state][1]);
+        g2d.setColor(cOuter);
         g2d.setStroke(new BasicStroke(4));
         g2d.drawOval(x - RADIUS,
                 y - RADIUS, 2*(RADIUS), 2*(RADIUS));
@@ -175,8 +187,7 @@ public class VertexPainter extends AbstractPainter implements MassController,Mou
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
         RenderingHints.VALUE_ANTIALIAS_OFF);
         g2d.setStroke(s);
-        
-    }
+	}
     
     @Override
     public String toString() {
@@ -236,6 +247,6 @@ public class VertexPainter extends AbstractPainter implements MassController,Mou
             velocity.setZero();
         }
         acceleration.setZero();
-    }    
+    } 
     
 }

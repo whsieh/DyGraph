@@ -13,7 +13,7 @@ import java.awt.image.PixelGrabber;
 
 import javax.swing.ImageIcon;
 
-public class ImageUtil {
+final public class ImageUtil {
 
 	private ImageUtil(){}
 	

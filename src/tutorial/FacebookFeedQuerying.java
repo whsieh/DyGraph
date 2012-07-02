@@ -19,7 +19,7 @@ public class FacebookFeedQuerying {
         
         /* Go to https://developers.facebook.com/tools/explorer to get an updated access token with extended permissions to read friendlists
          and read stream. The one below is expired. This procedure will be used for testing until the proper redirect scripts are in place. */
-        String ACCESS_TOKEN = "AAAG4zd1akV4BAM3cloZB8GZAW13k5XfvN1qOhXBIHhLv6QeRi6eePs0uTXPiwdk7MvGSazZBzR85ibJRgIMyjS4NAwqRXvPDzHPuorRGiG5exMn391p";
+        String ACCESS_TOKEN = "AAACEdEose0cBAF6ymPdw3ZBdSBqs1eDSXZB0FLncrinsfZCHwiDtZAprRQXut558qmX8wNpD3YsspvKU2P2rOJtAYYL4mHoCXUCdhbsrDoXR1AOxbh6ZB";
         FacebookClient fb = new DefaultFacebookClient(ACCESS_TOKEN);
         int MAX_TIME_MS = 5000;
 

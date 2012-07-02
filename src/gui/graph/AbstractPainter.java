@@ -4,6 +4,7 @@ import gui.graph.util.Message;
 import gui.graph.util.Data;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
@@ -24,13 +25,31 @@ abstract class AbstractPainter {
     
     abstract boolean contains(int x, int y);
     
-    abstract void paint(Graphics g);
+    protected void paint(Graphics g) {
+    	switch(state) {
+	    	case DEFAULT:
+	    		paintDefault(g);
+	    		break;
+	    	case FOCUSED:
+	    		paintFocused(g);
+	    		break;
+	    	case SELECTED:
+	    		paintSelected(g);
+	    		break;
+    	}
+    }
     
     abstract void inform(Message message, Data e);
 
     void setState(int state){ 
         this.state = state;
     }
+    
+    abstract void paintDefault(Graphics g);
+    
+    abstract void paintFocused(Graphics g);
+    
+    abstract void paintSelected(Graphics g);
     
     static Image transformWhiteToTransparency(BufferedImage image) {
         ImageFilter filter = new RGBImageFilter(){

@@ -26,6 +26,7 @@ public class WebLauncher extends JApplet{
     	} else {
     		ProfileQueryEngine.FB = new DefaultFacebookClient(DEBUG_TOKEN);
     	}
+    	ProfileQueryEngine.fetchFriendData();
         c = new BasicController(this);
         c.launch();
     }

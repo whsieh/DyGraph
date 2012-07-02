@@ -4,29 +4,31 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
+
+import util.dict.Entry;
 
 import com.restfb.Connection;
 import com.restfb.DefaultFacebookClient;
 import com.restfb.FacebookClient;
 import com.restfb.exception.FacebookNetworkException;
+import com.restfb.types.Comment;
+import com.restfb.types.NamedFacebookType;
 import com.restfb.types.Post;
 import com.restfb.types.User;
 
 public class ProfileQueryEngine {
 	
-	final private static String DEFAULT_ACCESS_TOKEN = "AAACEdEose0cBAFmWozoq2uZApTPKrWuWQVskge5MU3ZA38PMY7M7zD1gWtAD2xH8zORzUQLQxk0KDfB6bMg4KPk4HD76zd1BNiPl7UsKRaPcBcvuaK";
+	final private static String DEFAULT_ACCESS_TOKEN = "AAACEdEose0cBAF6ymPdw3ZBdSBqs1eDSXZB0FLncrinsfZCHwiDtZAprRQXut558qmX8wNpD3YsspvKU2P2rOJtAYYL4mHoCXUCdhbsrDoXR1AOxbh6ZB";
 	public static FacebookClient FB = new DefaultFacebookClient(DEFAULT_ACCESS_TOKEN);
 	final static String DEFAULT_PICTURE_URL = "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-snc4/174597_20531316728_2866555_q.jpg"; 
-	final public static Set<User> MY_FRIENDS = new HashSet<User>(300);
-	static {
-		fetchPersonalFriends();
-	}
+	final public static Map<String,String> MY_FRIENDS = new HashMap<String,String>(300);
+	public static Entry<String,String> CURRENT_USER;
 	
 	User me;
 	String profileID;
@@ -34,31 +36,43 @@ public class ProfileQueryEngine {
 	Iterator<List<Post>> myFeed;
 	
 	public static void main(String[] args) {
-		for (User friend : MY_FRIENDS) {
-			System.out.println(friend.getName() + " (ID:" + friend.getId() + ")");
+		
+		/* Finding friends */
+		ProfileQueryEngine.fetchFriendData();
+		for (String id : MY_FRIENDS.keySet()) {
+			System.out.println(MY_FRIENDS.get(id) + " (ID:" + id + ")");
 		}
 		System.out.println("Total: " + MY_FRIENDS.size());
+		
+		/* Parsing post data */
+		ProfileQueryEngine pqe = new ProfileQueryEngine("1110316640");
+		List<Post> posts = pqe.fetchNextPosts();
+		for (Post post : posts) {
+			System.out.println("\nRAW: ------------------------------>");
+            System.out.println("Type: " + post.getType() + " ID: " + post.getId());
+            System.out.println("Author: " + post.getFrom().getName() + " (ID:" + post.getFrom().getId() + ")");
+            String toPeople = "";
+            for (NamedFacebookType to : post.getTo()) {
+            	toPeople += to.getName() + " ";
+            }
+            System.out.println("To: " + toPeople);
+            System.out.println("Message: " + post.getMessage());
+            System.out.println("Comments: ");
+            for (Comment comment : post.getComments().getData()) {
+                System.out.println("    " + comment.getFrom().getName() + ": " + comment.getMessage());
+            }
+            System.out.println("CONVERTED: ------------------------------>");
+			System.out.println(FacebookUtil.toGraphData(post) + "\n\n");
+		}		
 	}
 	
-	ProfileQueryEngine() {
-		this.profileID = "1110316640";
+	ProfileQueryEngine(String profileID) {
+		this.profileID = profileID;
 		try {
 			me = FB.fetchObject(profileID,User.class);
 			isValid = true;
 		} catch (FacebookNetworkException e) {
 			isValid = false;
-		}
-		initialize();
-	}
-	
-	public ProfileQueryEngine(String profileID) {
-		
-		this.profileID = profileID;
-		User user = FB.fetchObject(profileID,User.class);
-		if (user.getName().equals("")) {
-			isValid = false;
-		} else {
-			isValid = true;
 		}
 		initialize();
 	}
@@ -70,11 +84,13 @@ public class ProfileQueryEngine {
 		}
 	}
 	
-	static void fetchPersonalFriends() {
+	public static void fetchFriendData() {
+		User me = FB.fetchObject("me", User.class);
+		ProfileQueryEngine.CURRENT_USER = new Entry<String,String>(me.getId(),me.getName());
 		Connection<User> myFriends = FB.fetchConnection("me/friends", User.class);
 		for (List<User> friendList : myFriends) {
 			for (User friend : friendList) {
-				MY_FRIENDS.add(friend);
+				MY_FRIENDS.put(friend.getId(),friend.getName());
 			}
 		}
 	}
