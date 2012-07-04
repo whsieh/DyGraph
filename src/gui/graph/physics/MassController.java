@@ -4,7 +4,7 @@ import util.misc.Vector2D;
 
 public interface MassController {
     
-    final static float ENERGY_LOSS_COEFFICIENT = -0.0025f;
+    final static float ENERGY_LOSS_COEFFICIENT = -0.004f;
     
     public float mass();
     

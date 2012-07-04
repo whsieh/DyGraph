@@ -13,11 +13,6 @@ public class BasicController extends GController{
     }
     
     @Override
-    public void handleMouseWheelMoved(MouseWheelEvent e){
-        // do nothing
-    }
-    
-    @Override
     public void handleKeyPressed(KeyEvent e) {
         super.handleKeyPressed(e);
         view.dragView(e);

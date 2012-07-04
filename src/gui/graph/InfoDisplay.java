@@ -7,6 +7,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
+@Deprecated
 class InfoDisplay extends JInternalFrame {
     
     GViewer view;
@@ -113,27 +114,27 @@ class InfoDisplay extends JInternalFrame {
         massSlider.setMinorTickSpacing(50);
         massSlider.setPaintTicks(true);
         massSlider.setToolTipText("Drag to change the mass of each vertex.");
-        massSlider.setValue(400);
+        massSlider.setValue(1000);
 
         equilibriumSlider.setMajorTickSpacing(100);
         equilibriumSlider.setMaximum(500);
         equilibriumSlider.setMinorTickSpacing(50);
         equilibriumSlider.setPaintTicks(true);
         equilibriumSlider.setToolTipText("Drag to change the equilibrium distance.");
-        equilibriumSlider.setValue(150);
+        equilibriumSlider.setValue(0);
 
-        equilibriumLabel.setText("Equlibrium Distance: 150");
+        equilibriumLabel.setText("Equlibrium Distance: 0");
 
-        repulsionLabel.setText("Repulsion Strength (log scale): 16");
+        repulsionLabel.setText("Repulsion Strength (log scale): 256");
 
         repulsionSlider.setMajorTickSpacing(8);
         repulsionSlider.setMaximum(48);
         repulsionSlider.setMinorTickSpacing(4);
         repulsionSlider.setPaintTicks(true);
         repulsionSlider.setToolTipText("Drag to change repulsion between vertices.");
-        repulsionSlider.setValue(16);
+        repulsionSlider.setValue(32);
 
-        massLabel.setText("Mass: 400");
+        massLabel.setText("Mass: 1000");
 
         GroupLayout physicsPaneLayout = new GroupLayout(physicsPane);
         physicsPane.setLayout(physicsPaneLayout);

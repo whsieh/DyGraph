@@ -15,22 +15,23 @@ import model.graph.Edge;
 import util.dict.CoordinateTable2D;
 import util.misc.Vector2D;
 
-// TODO Write methods that add data into the graph model and can request data
-// from the graph model. This kind of ganks standard MVC framework by making the
-// controller talk to the view and the view talk to the model, but it should
-// be enough to keep our project clean and organized.
+/* View-model invariant (please note). Each AbstractPainter in this graph should have an id field that
+ * matches its corresponding object in the graph model.
+ * 
+ * 
+ * */
 
 public class GViewer extends JPanel {
 	
-    static final boolean MOUSE_EVENT_TESTING = false;
-    static final boolean PHYSICS_TESTING = false;
-    static final boolean VERTEXTABLE_TESTING = true;
+	protected static final boolean MOUSE_EVENT_TESTING = false;
+    protected static final boolean PHYSICS_TESTING = false;
+    protected static final boolean VERTEXTABLE_TESTING = true;
     
-    static final boolean RUN_PHYSICS = true;
+    protected static final boolean RUN_PHYSICS = true;
     
-    static final int DEFAULT_WIDTH = (int)(Toolkit.getDefaultToolkit().getScreenSize().width * 0.75);
-    static final int DEFAULT_HEIGHT = (int)(Toolkit.getDefaultToolkit().getScreenSize().height * 0.75);
-    static final int SCREEN_SIZE_MULT = 4;
+    protected static final int DEFAULT_WIDTH = (int)(Toolkit.getDefaultToolkit().getScreenSize().width * 0.75);
+    protected static final int DEFAULT_HEIGHT = (int)(Toolkit.getDefaultToolkit().getScreenSize().height * 0.75);
+    protected static final int SCREEN_SIZE_MULT = 4;
     
     int popupX,popupY;
     final JPopupMenu WHITESPACE_POPUPMENU;
@@ -40,32 +41,30 @@ public class GViewer extends JPanel {
     final JMenuItem[] VERTEX_MENUITEMS;
     final JMenuItem[] EDGE_MENUITEMS;
 
-    static float repulsive_constant = (float)Math.pow(2,3);
-    static float equilibrium_length = 150;
-    static int unit_mass = 400;
+    protected static float repulsive_constant = (float)Math.pow(2,3);
+    protected static float equilibrium_length = 20;
+    protected static int unit_mass = 400;
     
-    boolean currentlyAddingEdge;
-    InfoDisplay infoDisplay;
+    protected boolean currentlyAddingEdge;
     
-    CoordinateTable2D<VertexPainter> vertexTable;
-    DLinkedList<VertexPainter> vertexList;
-    AbstractPainter currentlyFocused,currentlySelected,currentlyDragged;
-    DLinkedList<EdgePainter> edgeList;
+    protected CoordinateTable2D<VertexPainter> vertexTable;
+    protected DLinkedList<VertexPainter> vertexList;
+    protected AbstractPainter currentlyFocused,currentlySelected,currentlyDragged;
+    protected DLinkedList<EdgePainter> edgeList;
     
-    int curX;
-    int curY;
-    long prevArrowEvent;
-    int arrowEventCount;
+    protected int curX;
+    protected int curY;
+    protected long prevArrowEvent;
+    protected int arrowEventCount;
     
-    Rectangle bounds;
-    Graph graph;
-    GController controller;
+    protected Rectangle bounds;
+    protected Graph graph;
+    protected GController controller;
     
     public GViewer(GController controller){
         
         super();
         this.setFocusable(true);
-        this.infoDisplay = new InfoDisplay(this);
         this.graph = new Graph("New Graph");
         this.controller = controller;
         this.currentlyAddingEdge = false;
@@ -81,10 +80,6 @@ public class GViewer extends JPanel {
         popupX = 0;
         popupY = 0;
 
-        add(infoDisplay);
-        infoDisplay.setVisible(true);
-        
-        
         WHITESPACE_POPUPMENU = new JPopupMenu();
         VERTEX_POPUPMENU = new JPopupMenu();
         EDGE_POPUPMENU = new JPopupMenu();
@@ -133,7 +128,6 @@ public class GViewer extends JPanel {
     public void activate() {
         initiatePhysics();
         initiateAnimation();
-        this.infoDisplay.setLocation(10,10);
     }
     
     void displayPopup(MouseEvent me) {
@@ -212,7 +206,6 @@ public class GViewer extends JPanel {
         for(VertexPainter vp : vertexList){
             vp.moveTo(vp.x+deltaX,vp.y+deltaY);
         }
-        infoDisplay.setLocation(infoDisplay.getX()+deltaX,infoDisplay.getY()+deltaY);
     }
     
     public void dragView(KeyEvent e){
@@ -230,25 +223,21 @@ public class GViewer extends JPanel {
                 for(VertexPainter vp : vertexList){
                     vp.moveTo(vp.x-amount,vp.y);
                 }
-                infoDisplay.setLocation(infoDisplay.getX()-amount,infoDisplay.getY());
                 break;
             case KeyEvent.VK_LEFT:
                 for(VertexPainter vp : vertexList){
                     vp.moveTo(vp.x+amount,vp.y);
                 }
-                infoDisplay.setLocation(infoDisplay.getX()+amount,infoDisplay.getY());
                 break;
             case KeyEvent.VK_DOWN:
                 for(VertexPainter vp : vertexList){
                     vp.moveTo(vp.x,vp.y-amount);
                 }
-                infoDisplay.setLocation(infoDisplay.getX(),infoDisplay.getY()-amount);
                 break;
             case KeyEvent.VK_UP:
                 for(VertexPainter vp : vertexList){
                     vp.moveTo(vp.x,vp.y+amount);
                 }
-                infoDisplay.setLocation(infoDisplay.getX(),infoDisplay.getY()+amount);
                 break;
             default:
                 break;            

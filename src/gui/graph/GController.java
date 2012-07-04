@@ -15,11 +15,13 @@ import javax.swing.JApplet;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
+import model.graph.Graph;
+
 public abstract class GController {
     
-    protected static final float DEFAULT_REPULSIVE_CONST = (float)Math.pow(2,4);
-    protected static final float DEFAULT_EQUILIBRIUM_LENGTH = 150;
-    protected static final float DEFAULT_UNIT_MASS = 400;
+    protected static final float DEFAULT_REPULSIVE_CONST = (float)Math.pow(2,8);
+    protected static final float DEFAULT_EQUILIBRIUM_LENGTH = 50;
+    protected static final float DEFAULT_UNIT_MASS = 800;
     
     protected static final int DEFAULT_WIDTH = (int)(Toolkit.getDefaultToolkit().getScreenSize().width * 0.75);
     protected static final int DEFAULT_HEIGHT = (int)(Toolkit.getDefaultToolkit().getScreenSize().height * 0.75);
@@ -37,6 +39,7 @@ public abstract class GController {
     protected float unitMass = DEFAULT_UNIT_MASS;
     
     protected GPopulator gpop;
+    protected Graph graph;
     
     public GController(JApplet root) {
         this.root = root;
@@ -48,10 +51,6 @@ public abstract class GController {
         root.setVisible(true);
         view.setLayout(null);
         addInputListeners();
-                
-        view.infoDisplay.addKeyListener();
-        view.infoDisplay.addIconListener();
-        view.infoDisplay.addSliderListener();
         
         gpop = new GPopulator(view){
             @Override
@@ -59,6 +58,8 @@ public abstract class GController {
                 // empty graph
             }
         };
+        
+        graph = view.graph;
     }
     
     public void setPopulator(GPopulator pop) {
@@ -128,6 +129,28 @@ public abstract class GController {
             }
         }
     }
+    
+    public <TYPE> TYPE getData(String id, String key) {
+    	try {
+    		return (TYPE)graph.find(id).getData(key);
+    	} catch (ClassCastException e){
+    		System.err.println("Invalid class type when extracting: " +
+    				key + " from " + id);
+    		return null;
+    	} catch (NullPointerException e) {
+    		System.err.println("Invalid node identifier: " + id);
+    		return null;
+    	}
+    }
+    
+    public void setData(String id, String key, Object o) {
+    	try {
+    		graph.find(id).setData(key,o);
+    	} catch (NullPointerException e) {
+    		System.err.println("Invalid node identifier: " + id);
+    	}
+    }
+    
     public void handleMouseWheelMoved(MouseWheelEvent e) {
         if (e.isControlDown()) {
             repulsiveConstant *= (Math.pow(2,-0.5*e.getWheelRotation()));

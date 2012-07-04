@@ -11,10 +11,10 @@ public class Graph implements Named,Iterable<Vertex>{
     public final static int EDGE = 1;
     
     
-    Map <String, Edge> edgeMap;
-    Map <String, Vertex> vertexMap;
+    protected Map <String, Edge> edgeMap;
+    protected Map <String, Vertex> vertexMap;
     
-    String name;
+    protected String name;
     
     public Graph(String name) {
         edgeMap = new LinkedHashMap<String,Edge>();
@@ -39,22 +39,22 @@ public class Graph implements Named,Iterable<Vertex>{
         }
     }
     
-    public boolean updateVertexKey(String prevName, String newName) {
+    protected boolean updateVertexKey(String prevName, String newName) {
         Vertex v = vertexMap.remove(prevName);
         if (v != null) {
             vertexMap.put(newName,v);
-            v.setName(prevName);
+            v.setName(newName);
             return true;
         } else {
             return false;
         }
     }
     
-    public boolean updateEdgeKey(String prevName,String newName) {
+    protected boolean updateEdgeKey(String prevName,String newName) {
         Edge e = edgeMap.remove(prevName);
         if (e != null) {
             edgeMap.put(newName,e);
-            e.setName(prevName);
+            e.setName(newName);
             return true;
         } else {
             return false;

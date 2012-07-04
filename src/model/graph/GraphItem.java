@@ -19,7 +19,7 @@ public abstract class GraphItem implements Named{
         this.myGraph = myGraph;
     }
     
-    public Object getInfo(String key) {
+    public Object getData(String key) {
         return info.get(key);
     }
     
@@ -36,7 +36,7 @@ public abstract class GraphItem implements Named{
     /**
      * Adds the given data to the graph component under the given key.
      */
-    public void addData(String key, Object value){
+    public void setData(String key, Object value){
         info.put(key, value);
     }
     
