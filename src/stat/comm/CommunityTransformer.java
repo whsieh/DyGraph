@@ -17,7 +17,7 @@ import Jama.Matrix;
  * 		http://vw.indiana.edu/netsci06/conf-slides/conf-mon/netsci-talk-mark-newman.pdf
  * 		http://en.wikipedia.org/wiki/Modularity_(networks)
  * 
- * Note: the runtime on this is pretty terrible (something on the order of O(n^2log(n)))
+ * Note: the runtime on this is pretty terrible (something on the order of O((n^2)log(n)))
  * There is also a greedy version of modularity maximization developed by Clauset, Newman
  * and Moore that runs in O(nlog^2(n)). However, it is much more inaccurate and difficult
  * to implement.
