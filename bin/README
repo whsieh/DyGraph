@@ -29,8 +29,8 @@ There are also a few things to keep in mind when developing this project:
     [2] Make it work, then worry about making it optimal (I believe Knuth once said:
      "Premature optimization is the root of all evil").
 
-    This project should be ready for release by the end of 2 weeks--after the first week,
-     all of the separate modules should be complete; after the second week, all of the
+    This project should be ready for release by the end of 3 weeks--after the second week,
+     all of the separate modules should be complete; after the third week, all of the
      modules should be combined, and all major bugs fixed.
 
 II. Modules/Tasks
@@ -44,7 +44,7 @@ II. Modules/Tasks
 
 	    - SQL database: still trying to decide if we need this. Will be useful if users
 	     want to save their graphs so they can be opened later. Let's hold off on this
-	     until week 2.
+	     until week 3 or 4.
 
 	Java/JAR
 
@@ -96,12 +96,14 @@ II. Modules/Tasks
 		act as 'messengers' that contain all the relevant information to construct a new Vertex
 		representing a profile on Facebook or a new Edge representing communication between two
 		Facebook users.
-		
+		[In progress: see dygraph.FacebookQueryEngine]
+
 		1b. To get the Post objects to FacebookGraphAdapter in the first place, we should also
 		have a utility class named FacebookFeedExtractor that contains static methods necessary
 		to start at the access code and Facebook user ID and end at a collection of Post objects
 		representing Facebook posts.
-		
+		[In progress: see dygraph.FacebookUtil]
+
 		2a. We need to create a ProfilePainter class that extends VertexPainter and overrides the
 		paint methods. Instead of a simple circle, we need to paint a Facebook user's icon bordered
 		with a simple anti-aliased and rounded rectangular border with a color corresponding to the

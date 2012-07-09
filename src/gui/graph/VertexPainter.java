@@ -1,6 +1,6 @@
 package gui.graph;
 
-import gui.graph.physics.MassController;
+import gui.graph.physics.IMassController;
 import gui.graph.util.Data;
 import gui.graph.util.Message;
 
@@ -22,7 +22,7 @@ import util.list.InvalidNodeException;
 import util.list.ListNode;
 import util.misc.Vector2D;
 
-public class VertexPainter extends AbstractPainter implements MassController,MouseContainer {
+public class VertexPainter extends AbstractPainter implements IMassController,IMouseContainer {
     
 	protected final static int RADIUS = 12;
 	protected final static Color[][] STATE_COLORS = new Color[][] {
@@ -35,14 +35,14 @@ public class VertexPainter extends AbstractPainter implements MassController,Mou
     protected ListNode<VertexPainter> myListNode;
     protected CoordinateTable2D<VertexPainter> myTable;
     protected List<EdgePainter> myEdges;
-    protected int x;
-    protected int y;
-    protected Point curRegion;
+    volatile protected int x;
+    volatile protected int y;
+    volatile protected Point curRegion;
     
     /* Physics-related components */
-    protected Vector2D position;
-    protected Vector2D velocity;
-    protected Vector2D acceleration;
+    volatile protected Vector2D position;
+    volatile protected Vector2D velocity;
+    volatile protected Vector2D acceleration;
     
     protected VertexPainter(GViewer graphPane,int xPos, int yPos,String id) {
         
@@ -237,7 +237,7 @@ public class VertexPainter extends AbstractPainter implements MassController,Mou
     @Override
     public void updateAcceleration(Vector2D force) {
          acceleration.add(force.scaleTo(1/mass()));
-         acceleration.add(velocity.scaleTo(MassController.ENERGY_LOSS_COEFFICIENT));
+         acceleration.add(velocity.scaleTo(IMassController.ENERGY_LOSS_COEFFICIENT));
     }
     
     @Override

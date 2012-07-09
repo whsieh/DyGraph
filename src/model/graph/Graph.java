@@ -1,11 +1,17 @@
 package model.graph;
 
 import model.graph.exception.GraphException;
+import stat.util.Adaptable;
+import stat.util.AdjacencyList;
+import stat.util.BasicIntegerGraph;
+
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
-public class Graph implements Named,Iterable<Vertex>{
+public class Graph implements Named,Iterable<Vertex>,Adaptable{
     
     public final static int VERTEX = 0;
     public final static int EDGE = 1;
@@ -24,6 +30,16 @@ public class Graph implements Named,Iterable<Vertex>{
     
     public Edge findEdge(String name) {
         return edgeMap.get(name);
+    }
+    
+    public boolean hasEdge(String vID1, String vID2) {
+    	Vertex v1 = findVertex(vID1);
+    	Vertex v2 = findVertex(vID2);
+    	if (v1 == null || v2 == null) {
+    		return false;
+    	} else {
+    		return v1.edges.containsKey(v2) || v2.edges.containsKey(v1);
+    	}
     }
     
     public Vertex findVertex(String name) {
@@ -61,6 +77,14 @@ public class Graph implements Named,Iterable<Vertex>{
         }
     }
     
+    public Set<String> edges() {
+    	return edgeMap.keySet();
+    }
+    
+    public Set<String> vertices() {
+    	return vertexMap.keySet();
+    }
+    
     public Edge addEdge(String edgeName,String v1Name,String v2Name,int type) {
         if (findEdge(edgeName) == null || !v1Name.equals(v2Name)) {
             Vertex v1 = findVertex(v1Name);
@@ -75,6 +99,10 @@ public class Graph implements Named,Iterable<Vertex>{
         } else {
             throw GraphException.duplicate();
         }
+    }
+    
+    public Edge addEdge(String v1Name,String v2Name,int type) {
+        return addEdge(v1Name+"_"+v2Name,v1Name,v2Name,type);
     }
     
     public Vertex addVertex(String vName) {
@@ -135,14 +163,31 @@ public class Graph implements Named,Iterable<Vertex>{
         }
         return s;
     }
-    
-    public static void main(String[] args) {
-        Graph g = new Graph("New Graph");
-        g.addVertex("Test1");
-        g.addVertex("Test2");
-        g.addEdge("Edge0","Test1","Test2",Edge.UNDIRECTED);
-        g.addVertex("Test1");
-        System.out.println(g);
-    }
+
+	@Override
+	public <T> T adaptTo(Class cls) {
+		
+		if (cls == AdjacencyList.class) {
+			
+			Map<String,Integer> vertexNumberMap = new HashMap<String,Integer>();
+			int c = 0;
+			for (Vertex v : this) {
+				vertexNumberMap.put(v.id,c);
+				c++;
+			}
+			
+			AdjacencyList al = new AdjacencyList(vertexNumberMap);
+			for (Edge e : edgeMap.values()) {
+				int vIndex1 = al.getIndex(e.v1.id);
+				int vIndex2 = al.getIndex(e.v2.id);
+				if (vIndex1 < vIndex2) {
+					al.addEdge(vIndex1, vIndex2, e.weight);
+				}
+			}
+			
+			return (T)al;
+		}
+		return null;
+	}
     
 }

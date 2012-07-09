@@ -13,12 +13,18 @@ public class Edge extends GraphItem {
     Vertex v1;
     Vertex v2;
     int type;
+    double weight;
     
     protected Edge(String name,Vertex v1, Vertex v2,int type,Graph myGraph){
+        this(name,v1,v2,type,myGraph,1.0);
+    }
+    
+    protected Edge(String name,Vertex v1, Vertex v2,int type,Graph myGraph,double weight){
         super(name,myGraph);
         this.v1 = v1;
         this.v2 = v2;
         this.type = type;
+        this.weight = weight;
         updateVertices();
     }
     

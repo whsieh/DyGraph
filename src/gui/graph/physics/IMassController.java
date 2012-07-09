@@ -2,7 +2,7 @@ package gui.graph.physics;
 
 import util.misc.Vector2D;
 
-public interface MassController {
+public interface IMassController {
     
     final static float ENERGY_LOSS_COEFFICIENT = -0.004f;
     

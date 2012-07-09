@@ -2,7 +2,7 @@ package gui.graph;
 
 import java.awt.Point;
 
-public interface MouseContainer {
+public interface IMouseContainer {
     
     public boolean contains(Point p);
     

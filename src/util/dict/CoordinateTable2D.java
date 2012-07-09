@@ -1,6 +1,6 @@
 package util.dict;
 
-import gui.graph.MouseContainer;
+import gui.graph.IMouseContainer;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
@@ -100,7 +100,7 @@ public class CoordinateTable2D<V>{
                 return null;
             }
             for (V e : buckets[region.x][region.y]) {
-                if (((MouseContainer)(e)).contains(key)) {
+                if (((IMouseContainer)(e)).contains(key)) {
                     return e;
                 }
             }
@@ -119,7 +119,7 @@ public class CoordinateTable2D<V>{
                 return null;
             }
             for (V e : buckets[region.x][region.y]) {
-                if (((MouseContainer)(e)).contains(key) && v == e) {
+                if (((IMouseContainer)(e)).contains(key) && v == e) {
                     buckets[region.x][region.y].remove(e);
                     size--;
                     return e;
@@ -140,7 +140,7 @@ public class CoordinateTable2D<V>{
                 return null;
             }
             for (V e : buckets[region.x][region.y]) {
-                if (((MouseContainer)(e)).contains(key)) {
+                if (((IMouseContainer)(e)).contains(key)) {
                     buckets[region.x][region.y].remove(e);
                     size--;
                     return e;

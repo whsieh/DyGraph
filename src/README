@@ -29,8 +29,8 @@ There are also a few things to keep in mind when developing this project:
     [2] Make it work, then worry about making it optimal (I believe Knuth once said:
      "Premature optimization is the root of all evil").
 
-    This project should be ready for release by the end of 2 weeks--after the first week,
-     all of the separate modules should be complete; after the second week, all of the
+    This project should be ready for release by the end of 3 weeks--after the second week,
+     all of the separate modules should be complete; after the third week, all of the
      modules should be combined, and all major bugs fixed.
 
 II. Modules/Tasks
@@ -44,7 +44,7 @@ II. Modules/Tasks
 
 	    - SQL database: still trying to decide if we need this. Will be useful if users
 	     want to save their graphs so they can be opened later. Let's hold off on this
-	     until week 2.
+	     until week 3 or 4.
 
 	Java/JAR
 

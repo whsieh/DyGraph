@@ -2,7 +2,7 @@
 package gui.graph;
 
 import gui.graph.util.IDCounter;
-import gui.graph.physics.PhysicsController;
+import gui.graph.physics.IPhysicsController;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import model.graph.Graph;
@@ -373,7 +373,7 @@ public class GViewer extends JPanel {
         panel.addEdge(center, vp6);
     }
 }
-class GraphPhysicsSimulator implements PhysicsController {
+class GraphPhysicsSimulator implements IPhysicsController {
     
     static final int CYCLES_PER_SECOND = 60;
     static final int DEFAULT_FRAME_TIME_MS = 1000/CYCLES_PER_SECOND;

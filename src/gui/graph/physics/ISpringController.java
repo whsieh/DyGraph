@@ -2,7 +2,7 @@ package gui.graph.physics;
 
 import util.misc.Vector2D;
 
-public interface SpringController {
+public interface ISpringController {
    
    final static float DEFAULT_K = 0.05f;
    

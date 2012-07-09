@@ -13,7 +13,7 @@ import java.awt.image.ImageFilter;
 import java.awt.image.ImageProducer;
 import java.awt.image.RGBImageFilter;
 
-abstract class AbstractPainter {
+public abstract class AbstractPainter {
     
     static final int DEFAULT = 0;
     static final int FOCUSED = 1;

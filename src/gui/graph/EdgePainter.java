@@ -2,7 +2,7 @@ package gui.graph;
 
 import gui.graph.util.Message;
 import gui.graph.util.Data;
-import gui.graph.physics.SpringController;
+import gui.graph.physics.ISpringController;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -15,7 +15,7 @@ import util.list.ListNode;
 import util.misc.LinearEqn2D;
 import util.misc.Vector2D;
 
-public class EdgePainter extends AbstractPainter implements SpringController,MouseContainer{
+public class EdgePainter extends AbstractPainter implements ISpringController,IMouseContainer{
 
     static final int DEFAULT_DISPLACEMENT_ERROR = 4;
     
@@ -29,13 +29,13 @@ public class EdgePainter extends AbstractPainter implements SpringController,Mou
     /* Graph-related components */
     VertexPainter vp1;
     VertexPainter vp2;
-    LinearEqn2D eqn;
+    volatile LinearEqn2D eqn;
     ListNode myListNode;
     
     /* Physics-related components */
     float k;
     float equilibrium;
-    float currentLength;
+    volatile float currentLength;
 
     
     public EdgePainter(GViewer graphPane,VertexPainter vp1, VertexPainter vp2,String label){
@@ -49,7 +49,7 @@ public class EdgePainter extends AbstractPainter implements SpringController,Mou
         this.id = label;
         
         /* Initializing physics-related components */
-        k = SpringController.DEFAULT_K; // Change to scale to edge weight.
+        k = ISpringController.DEFAULT_K; // Change to scale to edge weight.
         equilibrium = myParent.controller.equilibriumLength;
         currentLength = equilibrium;
     }
