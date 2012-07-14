@@ -147,12 +147,6 @@ public class Dendrogram implements IStatResult{
 	}
 
 	@Override
-	public void drawDifferences(Graphics g, AbstractPainter ap) {
-		/* TODO Draw the vertex differently depending on
-		 * which vertex it belongs to. */
-	}
-
-	@Override
 	public int getType() {
 		return IStatResult.ABSTRACT;
 	}

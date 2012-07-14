@@ -10,9 +10,9 @@ import javax.swing.event.*;
 @Deprecated
 class InfoDisplay extends JInternalFrame {
     
-    GViewer view;
+    GraphViewer view;
 
-    public InfoDisplay(GViewer parent) {
+    public InfoDisplay(GraphViewer parent) {
         this.view = parent;
         initComponents();
         setFocusable(true);

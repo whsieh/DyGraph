@@ -3,15 +3,15 @@ package gui.graph;
 import java.util.LinkedList;
 import java.util.List;
 
-abstract public class GraphData {
+abstract public class GraphData <V extends GraphData.IVertexData, E extends GraphData.IEdgeData> {
 
-	protected List<IVertexData> vertexInfo;
-	protected List<IEdgeData> edgeInfo;
+	private List<V> vertexInfo;
+	private List<E> edgeInfo;
 	
 	public GraphData() {
 		
-		vertexInfo = new LinkedList<IVertexData>();
-		edgeInfo = new LinkedList<IEdgeData>();
+		setVertexInfo(new LinkedList<V>());
+		setEdgeInfo(new LinkedList<E>());
 	}
 	
 	abstract public void addVertexData(List<String> args);
@@ -19,15 +19,34 @@ abstract public class GraphData {
 	abstract public void addEdgeData(List<String> args);
 
 	
-	protected interface IVertexData {
+	public List<V> getVertexInfo() {
+		return vertexInfo;
+	}
+
+	public void setVertexInfo(List<V> vertexInfo) {
+		this.vertexInfo = vertexInfo;
+	}
+
+
+	public List<E> getEdgeInfo() {
+		return edgeInfo;
+	}
+
+	public void setEdgeInfo(List<E> edgeInfo) {
+		this.edgeInfo = edgeInfo;
+	}
+
+
+	public interface IVertexData {
 		
 		String getID();
 	}
 	
 	
-	protected interface IEdgeData {
+	public interface IEdgeData {
 		
 		String getID();
 		String[] getVertexID();
+		double weight();
 	}
 }

@@ -24,9 +24,9 @@ import com.restfb.types.User;
 
 public class ProfileQueryEngine {
 	
-	final private static String DEFAULT_ACCESS_TOKEN = "AAACEdEose0cBAF6ymPdw3ZBdSBqs1eDSXZB0FLncrinsfZCHwiDtZAprRQXut558qmX8wNpD3YsspvKU2P2rOJtAYYL4mHoCXUCdhbsrDoXR1AOxbh6ZB";
+	final private static String DEFAULT_ACCESS_TOKEN = "AAACEdEose0cBAN6SuV4cUAbTNGfEOB2YZB8ZACLnIWM0rpKZAfDpBaqFQWzsGJX17TctUZAsAsGsv6pEe2zjEofWgFVhpaGsgKJ8pGfmAy8NQTaFlh6j";
 	public static FacebookClient FB = new DefaultFacebookClient(DEFAULT_ACCESS_TOKEN);
-	final static String DEFAULT_PICTURE_URL = "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-snc4/174597_20531316728_2866555_q.jpg"; 
+	final static String DEFAULT_PICTURE_URL = "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-snc4/174597_20531316728_2866555_q.jpg";
 	final public static Map<String,String> MY_FRIENDS = new HashMap<String,String>(300);
 	public static Entry<String,String> CURRENT_USER;
 	
@@ -48,22 +48,16 @@ public class ProfileQueryEngine {
 		ProfileQueryEngine pqe = new ProfileQueryEngine("1110316640");
 		List<Post> posts = pqe.fetchNextPosts();
 		for (Post post : posts) {
-			System.out.println("\nRAW: ------------------------------>");
-            System.out.println("Type: " + post.getType() + " ID: " + post.getId());
-            System.out.println("Author: " + post.getFrom().getName() + " (ID:" + post.getFrom().getId() + ")");
-            String toPeople = "";
-            for (NamedFacebookType to : post.getTo()) {
-            	toPeople += to.getName() + " ";
-            }
-            System.out.println("To: " + toPeople);
-            System.out.println("Message: " + post.getMessage());
-            System.out.println("Comments: ");
-            for (Comment comment : post.getComments().getData()) {
-                System.out.println("    " + comment.getFrom().getName() + ": " + comment.getMessage());
-            }
-            System.out.println("CONVERTED: ------------------------------>");
 			System.out.println(FacebookUtil.toGraphData(post) + "\n\n");
-		}		
+		}
+		List<Post> posts2 = pqe.fetchNextPosts();
+		for (Post post : posts2) {
+			System.out.println(FacebookUtil.toGraphData(post) + "\n\n");
+		}
+		List<Post> posts3 = pqe.fetchNextPosts();
+		for (Post post : posts3) {
+			System.out.println(FacebookUtil.toGraphData(post) + "\n\n");
+		}
 	}
 	
 	ProfileQueryEngine(String profileID) {

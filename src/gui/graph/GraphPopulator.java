@@ -1,11 +1,11 @@
 
 package gui.graph;
 
-abstract public class GPopulator implements Runnable{
+abstract public class GraphPopulator implements Runnable{
     
-    protected GViewer view;
+    protected GraphViewer view;
     
-    public GPopulator(GViewer view) {
+    public GraphPopulator(GraphViewer view) {
         this.view = view;
     }
     

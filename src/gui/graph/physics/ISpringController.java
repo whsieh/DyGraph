@@ -4,7 +4,7 @@ import util.misc.Vector2D;
 
 public interface ISpringController {
    
-   final static float DEFAULT_K = 0.05f;
+   final static float DEFAULT_K = 1f;
    
    public float k();
    

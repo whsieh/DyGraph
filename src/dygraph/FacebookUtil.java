@@ -27,7 +27,7 @@ final public class FacebookUtil {
 						(user.getId().equals(ProfileQueryEngine.CURRENT_USER.key()) || ProfileQueryEngine.MY_FRIENDS.containsKey(user.getId()))) {
 					mentioned.add(user.getId());
 					data.addVertexData(user.getId(),user.getName());
-					data.addEdgeData(from.getId(),user.getId(),post.getMessage());
+					data.addEdgeData(from.getId(),user.getId(),post.getMessage(),FacebookGraphData.POST_WEIGHT);
 				}
 			}
 			for (Comment comment : post.getComments().getData()) {
@@ -38,11 +38,11 @@ final public class FacebookUtil {
 				}
 				for (NamedFacebookType user : to) {
 					if (!commentFrom.getId().equals(user.getId())) {
-						data.addEdgeData(commentFrom.getId(), user.getId() , comment.getMessage());
+						data.addEdgeData(commentFrom.getId(), user.getId() , comment.getMessage(), FacebookGraphData.COMMENT_WEIGHT);
 					}
 				}
 				if (!commentFrom.getId().equals(from.getId())) {
-					data.addEdgeData(commentFrom.getId(), from.getId() , comment.getMessage());
+					data.addEdgeData(commentFrom.getId(), from.getId() , comment.getMessage(), FacebookGraphData.COMMENT_WEIGHT);
 				}
 			}
 		}

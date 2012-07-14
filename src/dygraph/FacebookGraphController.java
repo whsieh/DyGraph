@@ -1,6 +1,8 @@
-package gui.graph.example;
+package dygraph;
 
 import gui.graph.GraphController;
+import gui.graph.GraphViewer;
+
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseWheelEvent;
 import javax.swing.JApplet;
@@ -9,10 +11,10 @@ import dygraph.FacebookGraphPopulator;
 
 import stat.comm.CommunityTransformer;
 
-public class BasicController extends GraphController{
+public class FacebookGraphController extends GraphController<FacebookGraphViewer>{
     
     
-    public BasicController(JApplet root) {
+    public FacebookGraphController(JApplet root) {
         super(root);
     }
     
@@ -22,6 +24,11 @@ public class BasicController extends GraphController{
         view.dragView(e);
     }
 
+    @Override
+    protected void createViewer() {
+    	view = new FacebookGraphViewer(this);
+    }
+    
     @Override
     public void launch() {
         this.setPopulator(new FacebookGraphPopulator(view));

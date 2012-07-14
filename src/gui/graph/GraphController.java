@@ -17,11 +17,11 @@ import javax.swing.UIManager.LookAndFeelInfo;
 
 import model.graph.Graph;
 
-public abstract class GController {
+public abstract class GraphController<T extends GraphViewer> {
     
-    protected static final float DEFAULT_REPULSIVE_CONST = (float)Math.pow(2,8);
-    protected static final float DEFAULT_EQUILIBRIUM_LENGTH = 50;
-    protected static final float DEFAULT_UNIT_MASS = 800;
+    protected static final float DEFAULT_REPULSIVE_CONST = (float)Math.pow(2,12);
+    protected static final float DEFAULT_EQUILIBRIUM_LENGTH = 100;
+    protected static final float DEFAULT_UNIT_MASS = 15000;
     
     protected static final int DEFAULT_WIDTH = (int)(Toolkit.getDefaultToolkit().getScreenSize().width * 0.75);
     protected static final int DEFAULT_HEIGHT = (int)(Toolkit.getDefaultToolkit().getScreenSize().height * 0.75);
@@ -31,28 +31,28 @@ public abstract class GController {
         setLookAndFeel("Nimbus","Nimbus");
     }
     
-    protected GViewer view;
+    protected T view;
     protected JApplet root;
     
     protected float repulsiveConstant = DEFAULT_REPULSIVE_CONST;
     protected float equilibriumLength = DEFAULT_EQUILIBRIUM_LENGTH;
     protected float unitMass = DEFAULT_UNIT_MASS;
     
-    protected GPopulator gpop;
+    protected GraphPopulator gpop;
     protected Graph graph;
     
-    public GController(JApplet root) {
+    public GraphController(JApplet root) {
         this.root = root;
         // root.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        view = new GViewer(this);
+        createViewer();
         root.setLayout(new GridLayout());
         root.add(view);
         root.setLocation(DEFAULT_WIDTH/6,DEFAULT_HEIGHT/6);
         root.setVisible(true);
         view.setLayout(null);
         addInputListeners();
-        
-        gpop = new GPopulator(view){
+
+        gpop = new GraphPopulator(view){
             @Override
             public void populate() {
                 // empty graph
@@ -62,7 +62,11 @@ public abstract class GController {
         graph = view.graph;
     }
     
-    public void setPopulator(GPopulator pop) {
+    protected void createViewer() {
+    	view = (T)new GraphViewer(this);
+    }
+    
+    public void setPopulator(GraphPopulator pop) {
         this.gpop = pop;
         new Thread(gpop).start();
     }
@@ -115,7 +119,7 @@ public abstract class GController {
                 handleKeyPressed(e);
             }
         });
-    }    
+    }
     
     public void handleKeyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_DELETE || e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {

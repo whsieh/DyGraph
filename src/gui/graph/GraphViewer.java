@@ -1,8 +1,13 @@
 
 package gui.graph;
 
+import gui.graph.GraphData.IEdgeData;
+import gui.graph.GraphData.IVertexData;
 import gui.graph.util.IDCounter;
 import gui.graph.physics.IPhysicsController;
+
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import model.graph.Graph;
@@ -12,16 +17,15 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import model.graph.Edge;
+import model.graph.exception.GraphException;
 import util.dict.CoordinateTable2D;
 import util.misc.Vector2D;
 
 /* View-model invariant (please note). Each AbstractPainter in this graph should have an id field that
  * matches its corresponding object in the graph model.
- * 
- * 
  * */
 
-public class GViewer extends JPanel {
+public class GraphViewer extends JPanel {
 	
 	protected static final boolean MOUSE_EVENT_TESTING = false;
     protected static final boolean PHYSICS_TESTING = false;
@@ -48,6 +52,7 @@ public class GViewer extends JPanel {
     protected boolean currentlyAddingEdge;
     
     protected CoordinateTable2D<VertexPainter> vertexTable;
+    protected Map<String,VertexPainter> vertexPainterMap;
     protected DLinkedList<VertexPainter> vertexList;
     protected AbstractPainter currentlyFocused,currentlySelected,currentlyDragged;
     protected DLinkedList<EdgePainter> edgeList;
@@ -59,9 +64,15 @@ public class GViewer extends JPanel {
     
     protected Rectangle bounds;
     protected Graph graph;
-    protected GController controller;
+    protected GraphController controller;
     
-    public GViewer(GController controller){
+    static public int[] getRandomPoints() {
+    	return new int[] {(int)(DEFAULT_WIDTH*Math.random()),
+    					(int)(DEFAULT_HEIGHT*Math.random())
+			};
+	}
+
+    public GraphViewer(GraphController controller){
         
         super();
         this.setFocusable(true);
@@ -73,6 +84,7 @@ public class GViewer extends JPanel {
                 2*DEFAULT_HEIGHT*SCREEN_SIZE_MULT);
         vertexTable = new CoordinateTable2D(bounds);
         vertexList = new DLinkedList<VertexPainter>();
+        vertexPainterMap = new HashMap<String,VertexPainter>();
         edgeList = new DLinkedList<EdgePainter>();
         this.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createBevelBorder(BevelBorder.RAISED),
@@ -189,13 +201,37 @@ public class GViewer extends JPanel {
         }
     }
     
-    void resetVertexTable() {
+    public void refreshVertexTable() {
         vertexTable = new CoordinateTable2D(new Rectangle(
                 -DEFAULT_WIDTH*SCREEN_SIZE_MULT,-DEFAULT_HEIGHT*SCREEN_SIZE_MULT,
                 2*DEFAULT_WIDTH*SCREEN_SIZE_MULT,2*DEFAULT_HEIGHT*SCREEN_SIZE_MULT));
         for (VertexPainter vp : vertexList) {
             vertexTable.insert(new Point(vp.x,vp.y),vp);
         }
+    }
+    
+    public void addGraphData(GraphData<? extends IVertexData,? extends IEdgeData> data) {
+    	for (IVertexData vd : data.getVertexInfo()) {
+    		String vid = vd.getID();
+    		if (graph.findVertex(vid) == null) {
+    			int[] randomPoints = GraphViewer.getRandomPoints();
+    			this.addVertex(vid, randomPoints[0], randomPoints[1]);
+    		}
+    	}
+    	for (IEdgeData ed : data.getEdgeInfo()) {
+    		String eid = ed.getID();
+    		String[] vid = ed.getVertexID();
+    		if (graph.findVertex(vid[0]) != null && graph.findVertex(vid[1]) != null) {
+    			VertexPainter vp1 = vertexPainterMap.get(vid[0]);
+    			VertexPainter vp2 = vertexPainterMap.get(vid[1]);
+    			Edge e = graph.findEdge(eid);
+	    		if (e == null) {
+	    			addEdge(eid,vp1,vp2,ed.weight());
+	    		} else {
+	    			e.addWeight(ed.weight());
+	    		}
+    		}
+    	}
     }
     
     public void dragView(MouseEvent e){
@@ -260,6 +296,7 @@ public class GViewer extends JPanel {
     void removeVertex(VertexPainter vp) {
         if (graph.removeVertex(vp.id) != null) {
             vp.remove();
+            vertexPainterMap.remove(vp.id);
         }
     }
     
@@ -269,13 +306,18 @@ public class GViewer extends JPanel {
         }
     }
     
-    public VertexPainter addVertex(String label,int x, int y){
+    public VertexPainter addVertex(String id,int x, int y){
+        return addVertex(id,x,y,id);
+    }
+    
+    public VertexPainter addVertex(String id,int x, int y, String displayName){
         try {
-            graph.addVertex(label);
-            VertexPainter vp = new VertexPainter(this,x,y,label);
+            graph.addVertex(id);
+            VertexPainter vp = new VertexPainter(this,x,y,id,displayName);
             vertexTable.insert(new Point(x,y),vp);
             vertexList.insertBack(vp);
             vp.myListNode = vertexList.back();
+            vertexPainterMap.put(id,vp);
             return vp;
         } catch (Exception e) {
             System.err.println(e);
@@ -283,11 +325,20 @@ public class GViewer extends JPanel {
         }
     }
     
-    public EdgePainter addEdge(VertexPainter vp1, VertexPainter vp2){
+    public EdgePainter addEdge(String id, VertexPainter vp1, VertexPainter vp2){
         try {
             String eName = "<" + vp1.id + "," + vp2.id + ">";
-            graph.addEdge(eName, vp1.id,vp2.id,Edge.UNDIRECTED);
-            EdgePainter e = new EdgePainter(this,vp1,vp2,eName);
+            return addEdge(eName,vp1,vp2,1.0);
+        } catch (Exception e) {
+            System.err.println(e);
+            return null;
+        }
+    }
+    
+    public EdgePainter addEdge(String id, VertexPainter vp1, VertexPainter vp2, double weight){
+        try {
+            graph.addEdge(id, vp1.id,vp2.id,Edge.UNDIRECTED, weight);
+            EdgePainter e = new EdgePainter(this,vp1,vp2,id);
             edgeList.insertBack(e);
             e.myListNode = edgeList.back();
             return e;
@@ -297,6 +348,17 @@ public class GViewer extends JPanel {
         }
     }
     
+    public EdgePainter addEdge(VertexPainter vp1, VertexPainter vp2){
+        try {
+            String eName = "<" + vp1.id + "," + vp2.id + ">";
+            return addEdge(eName,vp1,vp2,1.0);
+        } catch (Exception e) {
+            System.err.println(e);
+            return null;
+        }
+    }
+    
+    @Deprecated
     public void testTree(int cluster_vert_count,int anchor_vert_count) {
         VertexPainter[][] clusters = new VertexPainter[anchor_vert_count][cluster_vert_count];
         VertexPainter[] anchors = new VertexPainter[anchor_vert_count];
@@ -312,7 +374,7 @@ public class GViewer extends JPanel {
                 try {
                     Thread.sleep(250);
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(GViewer.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(GraphViewer.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
             if (anch != 0) {
@@ -320,7 +382,9 @@ public class GViewer extends JPanel {
             }
         }
     }
-    static VertexPainter testSmallWorld(GViewer panel,int numVertices,int localDist) {
+    
+    @Deprecated
+    static VertexPainter testSmallWorld(GraphViewer panel,int numVertices,int localDist) {
         VertexPainter[] vertices = new VertexPainter[numVertices];
         for(int i = 0; i < numVertices; i++) {
             vertices[i] = panel.addVertex("#"+IDCounter.next(),
@@ -341,7 +405,8 @@ public class GViewer extends JPanel {
         return vertices[0];
     }
     
-    static void testRandom(GViewer panel,int test_vert_count,float test_e_r_prob) {
+    @Deprecated
+    static void testRandom(GraphViewer panel,int test_vert_count,float test_e_r_prob) {
         VertexPainter[] vertices = new VertexPainter[test_vert_count];
         for(int i = 0; i < test_vert_count; i++) {            
             vertices[i] = panel.addVertex("#"+IDCounter.next(),
@@ -355,7 +420,9 @@ public class GViewer extends JPanel {
             }
         }
     }
-    static void testClusters(GViewer panel) {
+    
+    @Deprecated
+    static void testClusters(GraphViewer panel) {
         VertexPainter center = panel.addVertex("#"+IDCounter.next(),
                 (int)(Math.random()*DEFAULT_WIDTH),
                 (int)(Math.random()*DEFAULT_HEIGHT));
@@ -373,14 +440,15 @@ public class GViewer extends JPanel {
         panel.addEdge(center, vp6);
     }
 }
+
 class GraphPhysicsSimulator implements IPhysicsController {
     
     static final int CYCLES_PER_SECOND = 60;
     static final int DEFAULT_FRAME_TIME_MS = 1000/CYCLES_PER_SECOND;
     
-    GViewer g;
+    GraphViewer g;
     
-    private GraphPhysicsSimulator(GViewer g){
+    private GraphPhysicsSimulator(GraphViewer g){
         this.g = g;   
     }
     
@@ -399,7 +467,7 @@ class GraphPhysicsSimulator implements IPhysicsController {
         }
     }
     
-    static void runPhysics(GViewer g) {
+    static void runPhysics(GraphViewer g) {
         new Thread(new GraphPhysicsSimulator(g)).start();
     }
     
@@ -442,18 +510,15 @@ class GraphPhysicsSimulator implements IPhysicsController {
     
 }
 
-
-
-
 class Animator implements Runnable{
 
-    GViewer g;
+    GraphViewer g;
     
-    private Animator(GViewer g){
+    private Animator(GraphViewer g){
         this.g = g;   
     }
     
-    static void animate(GViewer g) {
+    static void animate(GraphViewer g) {
         new Thread(new Animator(g)).start();
     }
     

@@ -1,37 +1,47 @@
 package dygraph;
 
 import gui.graph.GraphData;
+import gui.graph.GraphData.IEdgeData;
+import gui.graph.GraphData.IVertexData;
 
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-public class FacebookGraphData extends GraphData {
+public class FacebookGraphData extends GraphData <FacebookGraphData.FacebookVertexData,FacebookGraphData.FacebookEdgeData> {
 
+	static final public double COMMENT_WEIGHT = 0.2;
+	static final public double POST_WEIGHT = 1.0;
+	
 	@Override
 	public void addVertexData(List<String> args) {
 		if (args.size() >= 2) {
-			vertexInfo.add(new FacebookVertexData(args.get(0),args.get(1)));
+			getVertexInfo().add(new FacebookVertexData(args.get(0),args.get(1)));
 		}
 	}
 	
 	public void addVertexData(String id, String name) {
-		vertexInfo.add(new FacebookVertexData(id,name));
+		getVertexInfo().add(new FacebookVertexData(id,name));
 	}
 	
 	@Override
 	public void addEdgeData(List<String> args) {
 		
-		if (args.size() >= 3 && !args.get(0).equals(args.get(1)) ) {
-			edgeInfo.add(new FacebookEdgeData(args.get(0),args.get(1),args.get(2)));
+		if (args.size() >= 4 && !args.get(0).equals(args.get(1)) ) {
+			getEdgeInfo().add(new FacebookEdgeData(args.get(0),args.get(1),args.get(2),Double.parseDouble(args.get(3))));
 		}
 	}
 	
-	public void addEdgeData(String user1, String user2, String message) {
+	public void addEdgeData(String user1, String user2, String message, double weight) {
 		
 		if (!user1.equals(user2)) {
-			edgeInfo.add(new FacebookEdgeData(user1, user2, message));
+			getEdgeInfo().add(new FacebookEdgeData(user1, user2, message,weight));
 		}
+	}
+	
+	public List<FacebookVertexData> getVertexData() {
+		return (List<FacebookVertexData>)getVertexInfo();
 	}
 	
 	class FacebookVertexData implements IVertexData {
@@ -57,12 +67,11 @@ public class FacebookGraphData extends GraphData {
 
 		String messageID;
 		String id,user1,user2;
+		double weight;
 		
-		FacebookEdgeData(String user1, String user2, String mID) {
+		FacebookEdgeData(String user1, String user2, String mID, double weight) {
 			
-			double u1 = Double.parseDouble(user1);
-			double u2 = Double.parseDouble(user2);
-			if (u1 < u2) {
+			if (user1.compareTo(user2) < 0) {
 				id = user1 + "_" + user2;
 				this.user1 = user1;
 				this.user2 = user2;
@@ -72,6 +81,7 @@ public class FacebookGraphData extends GraphData {
 				this.user2 = user1;
 			}
 			messageID = mID;
+			this.weight = weight;
 		}
 		
 		@Override
@@ -87,17 +97,34 @@ public class FacebookGraphData extends GraphData {
 		public String getMessageID() {
 			return messageID;
 		}
+		
+		public void addCommentWeight() {
+			weight += COMMENT_WEIGHT;
+		}
+		
+		public void addPostWeight() {
+			weight += POST_WEIGHT;
+		}
+		
+		public void addWeight(double w) {
+			weight += w;
+		}
+
+		@Override
+		public double weight() {
+			return weight;
+		}
 	}
 	
 	public String toString() {
 		StringBuilder s = new StringBuilder();
 		s.append("People to add to dygraph:\n");
-		for (IVertexData v : vertexInfo) {
+		for (IVertexData v : getVertexInfo()) {
 			FacebookVertexData fv = (FacebookVertexData)v;
 			s.append("\tName: " + fv.getName() + "\n\t\tID: " + fv.getID() + "\n");
 		}
 		s.append("Messages to add to dygraph:\n");
-		for (IEdgeData e : edgeInfo) {
+		for (IEdgeData e : getEdgeInfo()) {
 			FacebookEdgeData fe = (FacebookEdgeData)e;
 			s.append("\tParticipant ID: " + fe.user1 + " and " + fe.user2 + 
 					"\n\t\tMessage ID: " + fe.getMessageID() + "\n");

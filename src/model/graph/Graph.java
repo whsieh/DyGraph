@@ -85,16 +85,20 @@ public class Graph implements Named,Iterable<Vertex>,Adaptable{
     	return vertexMap.keySet();
     }
     
-    public Edge addEdge(String edgeName,String v1Name,String v2Name,int type) {
+    public Edge addEdge(String edgeName,String v1Name,String v2Name,int type, double weight) {
         if (findEdge(edgeName) == null || !v1Name.equals(v2Name)) {
             Vertex v1 = findVertex(v1Name);
             Vertex v2 = findVertex(v2Name);
-            if (v1 != null && v2 != null) {
-                Edge e = new Edge(edgeName,v1,v2,type,this);
-                edgeMap.put(edgeName,e);
-                return e;
+            if (v1 != null) {
+            	if (v2 != null) {
+	                Edge e = new Edge(edgeName,v1,v2,type,this, weight);
+	                edgeMap.put(edgeName,e);
+	                return e;
+            	} else {
+            		throw GraphException.notFound(" vertex " + v2Name);
+            	}
             } else {
-                throw GraphException.notFound(" vertex.");
+                throw GraphException.notFound(" vertex " + v1Name);
             }
         } else {
             throw GraphException.duplicate();
@@ -102,7 +106,7 @@ public class Graph implements Named,Iterable<Vertex>,Adaptable{
     }
     
     public Edge addEdge(String v1Name,String v2Name,int type) {
-        return addEdge(v1Name+"_"+v2Name,v1Name,v2Name,type);
+        return addEdge(v1Name+"_"+v2Name,v1Name,v2Name,type, 1.0);
     }
     
     public Vertex addVertex(String vName) {

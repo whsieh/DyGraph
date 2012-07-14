@@ -40,6 +40,14 @@ public class Edge extends GraphItem {
         return type;
     }
     
+    public void setWeight(double weight) {
+    	this.weight = weight;
+    }
+    
+    public void addWeight(double weight) {
+    	this.weight += weight;
+    }
+    
     /**
      * @return whether this Edge is directed.
      */

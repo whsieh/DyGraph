@@ -20,7 +20,7 @@ public abstract class AbstractPainter {
     static final int SELECTED = 2;
     
     int state;
-    GViewer myParent;
+    GraphViewer myParent;
     String id;
     
     abstract boolean contains(int x, int y);

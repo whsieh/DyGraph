@@ -10,7 +10,7 @@ public class FacebookVertexPainter extends VertexPainter{
 	// vertex. (Ex. button to delete node, button to view the person's Facebook profile, and a button
 	// to expand the node's connections.)
 	
-	FacebookVertexPainter(GViewer graphPane, int xPos, int yPos, String id) {
+	FacebookVertexPainter(GraphViewer graphPane, int xPos, int yPos, String id) {
 		super(graphPane, xPos, yPos, id);
 	}
 	

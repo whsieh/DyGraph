@@ -3,12 +3,12 @@ package gui.graph.example;
 import gui.graph.*;
 import gui.graph.util.IDCounter;
 
-public class RadialClusterPopulator extends GPopulator {
+public class RadialClusterPopulator extends GraphPopulator {
 
     int clusterSize;
     int numClusters;
     
-    public RadialClusterPopulator(GViewer view, int clusterSize, int numClusters) {
+    public RadialClusterPopulator(GraphViewer view, int clusterSize, int numClusters) {
         super(view);
         this.clusterSize = clusterSize;
         this.numClusters = numClusters;

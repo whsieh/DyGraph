@@ -38,7 +38,7 @@ public class EdgePainter extends AbstractPainter implements ISpringController,IM
     volatile float currentLength;
 
     
-    public EdgePainter(GViewer graphPane,VertexPainter vp1, VertexPainter vp2,String label){
+    public EdgePainter(GraphViewer graphPane,VertexPainter vp1, VertexPainter vp2,String label){
         
         /* Initializing graph-related components */
         this.myParent = graphPane;
@@ -125,7 +125,7 @@ public class EdgePainter extends AbstractPainter implements ISpringController,IM
         Color origColor = g.getColor();
         
         g.setColor(c);
-        g2d.setStroke(new BasicStroke(3));
+        g2d.setStroke(new BasicStroke(2));
         
         g.drawLine(vp1.x,vp1.y,vp2.x,vp2.y);
         

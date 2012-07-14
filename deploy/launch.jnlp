@@ -6,7 +6,6 @@
 		<homepage href=""/>
 		<description>Graph Visualization Applet</description>
 		<description kind="short">Graph Visualization Applet</description>
-		<icon href="logo_icon.ico" kind="default"/>
 		<offline-allowed/>
 	</information>
 	<update check="background"/>
@@ -14,5 +13,5 @@
 		<j2se version="1.6+"/>
 		<jar href="DyGraph.jar" main="true"/>	
 	</resources>
-    <applet-desc height="600" main-class="web.WebLauncher" name="DyGraph" width="800"></applet-desc>
+    <applet-desc height="600" main-class="dygraph.DygraphApplet" name="DyGraph" width="800"></applet-desc>
 </jnlp>
