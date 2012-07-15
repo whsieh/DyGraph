@@ -28,7 +28,7 @@ public abstract class GraphController<T extends GraphViewer> {
     protected static final int SCREEN_SIZE_MULT = 4;
     
     static{
-        setLookAndFeel("Nimbus","Nimbus");
+        setLookAndFeel("Windows","Windows");
     }
     
     protected T view;

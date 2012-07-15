@@ -5,6 +5,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 
+import gui.console.Console;
 import gui.graph.example.*;
 
 import javax.swing.JApplet;
@@ -16,7 +17,7 @@ public class DygraphApplet extends JApplet{
     
 	final static int DEFAULT_WIDTH = 1600;
 	final static int DEFAULT_HEIGHT = 900;
-	final static String DEBUG_TOKEN = "AAACEdEose0cBADX10mFtU82PKXlo31CbIm9a2G0b9DYMWL1sjBZBBEamfZCHnMPuxcuM4QPd7BUpdUY0CZADxI3XrtpBEQZAhVlnoum9ZAxiMcyNXypPK";
+	final static String DEBUG_TOKEN = "AAACEdEose0cBAHr3p1AUGJRKMiHSrHTCueL2IeWOWSXoTLiyYbmZAyRqotjuDR6aWk0XBG7sYOWfN2xmSJCo6KXOytR2cxidsbuUdgrJZBSwjtkVek";
 									
 	FacebookGraphController c;
 	
@@ -52,6 +53,7 @@ public class DygraphApplet extends JApplet{
     	ProfileQueryEngine.fetchFriendData();
         c = new FacebookGraphController(dygraph);
         c.launch();
+        Console.getInstance().display();
     }
     
     @Override

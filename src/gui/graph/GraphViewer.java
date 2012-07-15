@@ -37,13 +37,14 @@ public class GraphViewer extends JPanel {
     protected static final int DEFAULT_HEIGHT = (int)(Toolkit.getDefaultToolkit().getScreenSize().height * 0.75);
     protected static final int SCREEN_SIZE_MULT = 4;
     
-    int popupX,popupY;
-    final JPopupMenu WHITESPACE_POPUPMENU;
-    final JPopupMenu VERTEX_POPUPMENU;
-    final JPopupMenu EDGE_POPUPMENU;
-    final JMenuItem[] WHITESPACE_MENUITEMS;
-    final JMenuItem[] VERTEX_MENUITEMS;
-    final JMenuItem[] EDGE_MENUITEMS;
+    protected int popupX,popupY;
+    
+    protected JPopupMenu WHITESPACE_POPUPMENU;
+    protected JPopupMenu VERTEX_POPUPMENU;
+    protected JPopupMenu EDGE_POPUPMENU;
+    protected JMenuItem[] WHITESPACE_MENUITEMS;
+    protected JMenuItem[] VERTEX_MENUITEMS;
+    protected JMenuItem[] EDGE_MENUITEMS;
 
     protected static float repulsive_constant = (float)Math.pow(2,3);
     protected static float equilibrium_length = 20;
@@ -92,6 +93,11 @@ public class GraphViewer extends JPanel {
         popupX = 0;
         popupY = 0;
 
+        createContextMenu();
+    }
+    
+    protected void createContextMenu() {
+    	
         WHITESPACE_POPUPMENU = new JPopupMenu();
         VERTEX_POPUPMENU = new JPopupMenu();
         EDGE_POPUPMENU = new JPopupMenu();
@@ -142,7 +148,7 @@ public class GraphViewer extends JPanel {
         initiateAnimation();
     }
     
-    void displayPopup(MouseEvent me) {
+    protected void displayPopup(MouseEvent me) {
         popupX = me.getX();
         popupY = me.getY();
         AbstractPainter v = locateVertexPainter(popupX,popupY);
@@ -293,14 +299,14 @@ public class GraphViewer extends JPanel {
         return null;
     }
     
-    void removeVertex(VertexPainter vp) {
+    protected void removeVertex(VertexPainter vp) {
         if (graph.removeVertex(vp.id) != null) {
             vp.remove();
             vertexPainterMap.remove(vp.id);
         }
     }
     
-    void removeEdge(EdgePainter ep) {
+    protected void removeEdge(EdgePainter ep) {
         if (graph.removeEdge(ep.id) != null) {
             ep.remove();
         }
@@ -476,12 +482,8 @@ class GraphPhysicsSimulator implements IPhysicsController {
      */
     private Vector2D repulsiveForce(VertexPainter vp1, VertexPainter vp2) {
         float squareDist = (float)(Math.pow(vp2.x-vp1.x,2)+Math.pow(vp2.y-vp1.y,2));
-        if (squareDist < MAX_REPEL_DIST_SQUARED) {
-            return new Vector2D((vp2.x-vp1.x)/squareDist,(vp2.y-vp1.y)/squareDist,
-                Vector2D.CARTESIAN,Vector2D.FORCE).scaleTo(g.controller.repulsiveConstant);
-        } else {
-            return new Vector2D(0,0,Vector2D.CARTESIAN,Vector2D.FORCE);
-        }
+        return new Vector2D((vp2.x-vp1.x)/squareDist,(vp2.y-vp1.y)/squareDist,
+            Vector2D.CARTESIAN,Vector2D.FORCE).scaleTo(g.controller.repulsiveConstant);
     }
     
     @Override
