@@ -134,7 +134,7 @@ public class CommunityTransformer implements IStatTransformer<Dendrogram>{
 			double[][] eigenvectors = decomp.getV().getArray();
 			/* If the leading eigenvalue is 0 or negative, the index will not
 			 * be reset, and the cluster will be considered as one community */
-			double greatest = 0.001;
+			double greatest = 0.0001;
 			int indexOfGreatest = -1;
 			/* Search for the leading eigenvalue */
 			for (int i = 0; i < eigenvalues.length; i++) {
@@ -155,9 +155,9 @@ public class CommunityTransformer implements IStatTransformer<Dendrogram>{
 				 * close to zero are not partitioned */
 				for (int i = 0; i < indices.length; i++) {
 					double val = eigenvectors[i][indexOfGreatest];
-					if (val > 0.01) {
+					if (val > 0.0001) {
 						toFirst.add(indices[i]);
-					} else if (val < -0.01){
+					} else if (val < -0.0001){
 						toSecond.add(indices[i]);
 					}
 				}

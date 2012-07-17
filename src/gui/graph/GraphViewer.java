@@ -319,7 +319,7 @@ public class GraphViewer extends JPanel {
     public VertexPainter addVertex(String id,int x, int y, String displayName){
         try {
             graph.addVertex(id);
-            VertexPainter vp = new VertexPainter(this,x,y,id,displayName);
+            VertexPainter vp = createVertexPainter(x,y,id,displayName);
             vertexTable.insert(new Point(x,y),vp);
             vertexList.insertBack(vp);
             vp.myListNode = vertexList.back();
@@ -362,6 +362,10 @@ public class GraphViewer extends JPanel {
             System.err.println(e);
             return null;
         }
+    }
+    
+    protected VertexPainter createVertexPainter(int x, int y, String id, String displayName) {
+    	return new VertexPainter(this,x,y,id,displayName);
     }
     
     @Deprecated

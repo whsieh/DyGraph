@@ -20,7 +20,6 @@ final public class FacebookUtil {
 		NamedFacebookType from = post.getFrom();
 		if (ProfileQueryEngine.MY_FRIENDS.containsKey(from.getId())) {
 			mentioned.add(from.getId());
-			data.addVertexData(from.getId(),from.getName());
 			List<NamedFacebookType> to = post.getTo();
 			for (NamedFacebookType user : to) {
 				if (!mentioned.contains(user.getId()) &&

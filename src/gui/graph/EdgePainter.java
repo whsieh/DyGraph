@@ -181,7 +181,7 @@ public class EdgePainter extends AbstractPainter implements ISpringController,IM
         return 0.5f * k * (float)Math.pow(displacement(),2);
     }
     
-    /*THIS METHOD SUCKS...MAKE IT NOT RETARDED*/
+    /* TODO THIS METHOD SUCKS...MAKE IT NOT RETARDED*/
     void remove() {
         try{
             myListNode.remove();
@@ -194,17 +194,17 @@ public class EdgePainter extends AbstractPainter implements ISpringController,IM
     }
 
 	@Override
-	void paintDefault(Graphics g) {
+	protected void paintDefault(Graphics g) {
 		paintLine(g, EDGE_COLORS[AbstractPainter.DEFAULT]);
 	}
 
 	@Override
-	void paintFocused(Graphics g) {
+	protected void paintFocused(Graphics g) {
 		paintLine(g, EDGE_COLORS[AbstractPainter.FOCUSED]);
 	}
 
 	@Override
-	void paintSelected(Graphics g) {
+	protected void paintSelected(Graphics g) {
 		paintLine(g, EDGE_COLORS[AbstractPainter.SELECTED]);
 	}
 

@@ -28,7 +28,9 @@ public abstract class GraphController<T extends GraphViewer> {
     protected static final int SCREEN_SIZE_MULT = 4;
     
     static{
-        setLookAndFeel("Windows","Windows");
+    	try{ 
+		   UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch(Exception e){}
     }
     
     protected T view;
@@ -60,6 +62,14 @@ public abstract class GraphController<T extends GraphViewer> {
         };
         
         graph = view.graph;
+    }
+    
+    public GraphViewer getView() {
+    	return view;
+    }
+    
+    public Graph getModel() {
+    	return graph;
     }
     
     protected void createViewer() {

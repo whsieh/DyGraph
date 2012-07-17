@@ -35,6 +35,7 @@ public class VertexPainter extends AbstractPainter implements IMassController,
 	protected CoordinateTable2D<VertexPainter> myTable;
 	protected List<EdgePainter> myEdges;
 	protected String displayName;
+	
 	volatile protected int x;
 	volatile protected int y;
 	volatile protected Point curRegion;
@@ -158,21 +159,21 @@ public class VertexPainter extends AbstractPainter implements IMassController,
 	}
 
 	@Override
-	void paintDefault(Graphics g) {
+	protected void paintDefault(Graphics g) {
 		Graphics2D g2d = (Graphics2D) g;
 		paintCircularVertex(g2d, STATE_COLORS[AbstractPainter.DEFAULT][0],
 				STATE_COLORS[AbstractPainter.DEFAULT][1]);
 	}
 
 	@Override
-	void paintFocused(Graphics g) {
+	protected void paintFocused(Graphics g) {
 		Graphics2D g2d = (Graphics2D) g;
 		paintCircularVertex(g2d, STATE_COLORS[AbstractPainter.FOCUSED][0],
 				STATE_COLORS[AbstractPainter.FOCUSED][1]);
 	}
 
 	@Override
-	void paintSelected(Graphics g) {
+	protected void paintSelected(Graphics g) {
 		Graphics2D g2d = (Graphics2D) g;
 		paintCircularVertex(g2d, STATE_COLORS[AbstractPainter.SELECTED][0],
 				STATE_COLORS[AbstractPainter.SELECTED][1]);

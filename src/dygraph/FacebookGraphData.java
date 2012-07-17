@@ -20,6 +20,7 @@ public class FacebookGraphData extends GraphData <FacebookGraphData.FacebookVert
 			getVertexInfo().add(new FacebookVertexData(args.get(0),args.get(1)));
 		}
 	}
+
 	
 	public void addVertexData(String id, String name) {
 		getVertexInfo().add(new FacebookVertexData(id,name));
@@ -46,7 +47,7 @@ public class FacebookGraphData extends GraphData <FacebookGraphData.FacebookVert
 	
 	class FacebookVertexData implements IVertexData {
 
-		String id,name;
+		String id,name;		
 		
 		FacebookVertexData(String id, String name) {
 			this.id = id;

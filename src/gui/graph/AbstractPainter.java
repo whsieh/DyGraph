@@ -15,13 +15,13 @@ import java.awt.image.RGBImageFilter;
 
 public abstract class AbstractPainter {
     
-    static final int DEFAULT = 0;
-    static final int FOCUSED = 1;
-    static final int SELECTED = 2;
+    protected static final int DEFAULT = 0;
+    protected static final int FOCUSED = 1;
+    protected static final int SELECTED = 2;
     
-    int state;
-    GraphViewer myParent;
-    String id;
+    protected int state;
+    protected GraphViewer myParent;
+    protected String id;
     
     abstract boolean contains(int x, int y);
     
@@ -41,15 +41,15 @@ public abstract class AbstractPainter {
     
     abstract void inform(Message message, Data e);
 
-    void setState(int state){ 
+    protected void setState(int state){ 
         this.state = state;
     }
     
-    abstract void paintDefault(Graphics g);
+    protected abstract void paintDefault(Graphics g);
     
-    abstract void paintFocused(Graphics g);
+    protected abstract void paintFocused(Graphics g);
     
-    abstract void paintSelected(Graphics g);
+    protected abstract void paintSelected(Graphics g);
     
     static Image transformWhiteToTransparency(BufferedImage image) {
         ImageFilter filter = new RGBImageFilter(){

@@ -41,7 +41,7 @@ public class FacebookGraphPopulator extends GraphPopulator {
 		idQueue.add(ProfileQueryEngine.CURRENT_USER.key());
 		int queries = 1;
 		
-		while (queries < 10 && !idQueue.isEmpty()) {
+		while (queries < 20 && !idQueue.isEmpty()) {
 			
 			String id = idQueue.remove();
 			

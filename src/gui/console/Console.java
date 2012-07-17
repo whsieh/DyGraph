@@ -1,17 +1,25 @@
 package gui.console;
 
+import gui.graph.GraphController;
+import gui.graph.GraphViewer;
+
 import java.awt.Color;
-import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Frame;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
+import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +37,9 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
+
+import stat.comm.CommunityTransformer;
+import stat.comm.Dendrogram;
 
 public class Console extends JFrame {
 
@@ -52,10 +63,11 @@ public class Console extends JFrame {
 	private JMenuItem menuItemShowCommands;
 	
 	private boolean isLeetMode;
-
 	private List<String> commandHistory;
 	private int historyIndex;
+	private int posX=0,posY=0;
 	
+	private GraphController controller;	
 	
 	/**
 	 * Create the frame.
@@ -66,9 +78,14 @@ public class Console extends JFrame {
 		commandHistory.add("");
 		commandHistory.add("");
 		isLeetMode = false;
+		controller = null;
 		initializeComponents();
 		initializeListeners();
 		log("Console initialized");
+	}
+	
+	public void setController(GraphController controller) {
+		this.controller = controller;
 	}
 
 	public static Console getInstance() {
@@ -78,28 +95,113 @@ public class Console extends JFrame {
 		return CONSOLE;		
 	}
 	
+	public static boolean exists() {
+		return CONSOLE != null;	
+	}
+	
 	public void display() {
 		setVisible(true);
 	}
 	
 	public void log(String s) {
-		output.append(LOG_STRING + " " + s + "\n");
+		String[] lines = s.split("\n");
+		output.append(LOG_STRING + " " + lines[0] + "\n");
+		for (int i = 1; i < lines.length; i++) {
+			output.append("   " + lines[i] + "\n");
+		}
 	}
 	
 	public void err(String s) {
-		output.append(ERR_STRING + " " + s + "\n");
+		String[] lines = s.split("\n");
+		output.append(ERR_STRING + " " + lines[0] + "\n");
+		for (int i = 1; i < lines.length; i++) {
+			output.append("   " + lines[i] + "\n");
+		}
+	}
+	
+	private void parseStat(String[] in) {
+		if (controller != null) {
+			if (in.length == 1) {
+				log("Usage for \"stat\":\n" + 
+					"   stat comm: Run the modularity-based community detection algorithm.");
+			} else if (in.length >= 2) {
+				if (in[1].equals("comm")) {
+					log("Running community detection algorithm...");
+					long start = System.nanoTime();
+					Dendrogram result = new CommunityTransformer().transform(controller.getModel());
+					int end = (int)((System.nanoTime() - start)/1000000.0);
+					log(result.toString());
+					log("Time taken: " + end + " ms");
+				}
+			}
+		} else {
+			err("Missing reference to graph controller.");
+		}
 	}
 	
 	private void parse(String command) {
-		
-		switch(command) {
+		String[] in = command.split(" ");
+		if (in.length > 0 && !in[0].equals("")) {
+		switch(in[0]) {
+			case "stat":
+				parseStat(in);
+				break;
+			case "cls":
+				output.setText("");
+				break;
+			case "close":
+				dispose();
+				break;
+			case "exit":
+				System.exit(0);
 			default:
 				err("Unrecognized command: " + command);
 				break;
 		}
+		} else {
+			log("");
+		}
+	}
+	
+	@Override
+	public void paint(Graphics g) {
+		super.paint(g);
+		paintBorder((Graphics2D)g);
+	}
+	
+	private void paintBorder(Graphics2D g) {
+		
+		Color c = g.getColor();
+		
+		g.setColor(Color.DARK_GRAY);
+		
+		Rectangle rect = getBounds();
+		RoundRectangle2D roundedRectangle = new RoundRectangle2D.Float(0,0,rect.width-1,rect.height-1,5,5);
+		g.draw(roundedRectangle);
+		
+		g.setColor(c);
 	}
 
 	private void initializeListeners() {
+		
+		addMouseListener(new MouseAdapter() {
+			@Override
+		    public void mousePressed(MouseEvent e) {
+				posX=e.getX();
+				posY=e.getY();
+			}
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				repaint();
+			}
+		});
+		
+		addMouseMotionListener(new MouseAdapter() {
+			@Override
+			public void mouseDragged(MouseEvent evt) {		
+				setLocation(evt.getXOnScreen()-posX,evt.getYOnScreen()-posY);
+			}
+		});		
 		
 		input.addActionListener(new ActionListener() {
 			@Override
@@ -141,6 +243,17 @@ public class Console extends JFrame {
 			}
 		});
 		
+		MouseAdapter exitBorderRepaint = new MouseAdapter() {
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				repaint(0,0,getWidth(),1);
+			}
+		};
+		
+		menuFile.addMouseListener(exitBorderRepaint);
+		menuEdit.addMouseListener(exitBorderRepaint);
+		menuHelp.addMouseListener(exitBorderRepaint);
+		
 		menuItemLeetMode.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -152,6 +265,7 @@ public class Console extends JFrame {
 					output.setForeground(new Color(0,0,0));
 				}
 				isLeetMode = !isLeetMode;
+				repaint(0,0,getWidth(),1);
 			}
 		});
 		
@@ -159,6 +273,7 @@ public class Console extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				output.setText("");
+				repaint(0,0,getWidth(),1);
 			}
 		});
 		
@@ -167,14 +282,14 @@ public class Console extends JFrame {
             	setState(Frame.ICONIFIED);
             }
         });
-
-
-	}	
+	}
 	
 	private void initializeComponents() {
+		
 		setTitle("Debug Console");
-		setBounds(100, 100, 500, 600);
+		setBounds(100, 100, 800, 600);
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+		setUndecorated(true);
 		
 		menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
@@ -264,6 +379,8 @@ public class Console extends JFrame {
 		gbc_input.gridy = 2;
 		contentPane.add(input, gbc_input);
 		input.setColumns(10);
+		
+		log("Please note: this build has a ton of issues.\n   Hopefully vertices flying everywhere is not one of them.");
 	}
 	
 }

@@ -17,7 +17,7 @@ public class DygraphApplet extends JApplet{
     
 	final static int DEFAULT_WIDTH = 1600;
 	final static int DEFAULT_HEIGHT = 900;
-	final static String DEBUG_TOKEN = "AAACEdEose0cBAHr3p1AUGJRKMiHSrHTCueL2IeWOWSXoTLiyYbmZAyRqotjuDR6aWk0XBG7sYOWfN2xmSJCo6KXOytR2cxidsbuUdgrJZBSwjtkVek";
+	final static String DEBUG_TOKEN = "AAACEdEose0cBAIqqRQi9Jh6BewGvJJsPfVSc5xEP7gmzOfwjiP1ToShMJUM0JIwxXUjMOxlLYHhghtIDYu33bYg9ZCYHOg16ZAupa0nWggpfKZB9LE9";
 									
 	FacebookGraphController c;
 	
@@ -54,6 +54,7 @@ public class DygraphApplet extends JApplet{
         c = new FacebookGraphController(dygraph);
         c.launch();
         Console.getInstance().display();
+        Console.getInstance().setController(c);
     }
     
     @Override

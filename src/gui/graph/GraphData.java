@@ -38,7 +38,7 @@ abstract public class GraphData <V extends GraphData.IVertexData, E extends Grap
 
 
 	public interface IVertexData {
-		
+
 		String getID();
 	}
 	

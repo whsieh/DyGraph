@@ -97,7 +97,7 @@ public class ProfileQueryEngine {
 		return null;
 	}
 	
-	public BufferedImage fetchPicture() {
+	public static BufferedImage fetchPicture(String profileID) {
 		
 		try {
 			URL imgURL = new URL("https://graph.facebook.com/" + profileID + "/picture");

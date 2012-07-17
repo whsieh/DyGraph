@@ -7,8 +7,10 @@ import java.awt.event.ActionListener;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
+import dygraph.FacebookGraphData.FacebookEdgeData;
 import dygraph.FacebookGraphData.FacebookVertexData;
 import model.graph.Edge;
+import gui.console.Console;
 import gui.graph.EdgePainter;
 import gui.graph.GraphController;
 import gui.graph.GraphData;
@@ -81,15 +83,23 @@ public class FacebookGraphViewer extends GraphViewer {
         });
 	}
 	
+	@Override
+	protected VertexPainter createVertexPainter(int x, int y, String id, String displayName) {
+		return new FacebookVertexPainter(this,x,y,id,displayName);
+	}
+	
     private void addFacebookGraphData(FacebookGraphData data) {
     	for (FacebookVertexData vd : data.getVertexInfo()) {
     		String vid = vd.getID();
     		if (graph.findVertex(vid) == null) {
     			int[] randomPoints = GraphViewer.getRandomPoints();
+    			if (Console.exists()) {
+    				Console.getInstance().log("Adding user " + vid + " (" + vd.getName() + ")");
+    			}
     			this.addVertex(vid, randomPoints[0], randomPoints[1],vd.getName());
     		}
     	}
-    	for (IEdgeData ed : data.getEdgeInfo()) {
+    	for (FacebookEdgeData ed : data.getEdgeInfo()) {
     		String eid = ed.getID();
     		String[] vid = ed.getVertexID();
     		if (graph.findVertex(vid[0]) != null && graph.findVertex(vid[1]) != null) {
@@ -97,6 +107,10 @@ public class FacebookGraphViewer extends GraphViewer {
     			VertexPainter vp2 = vertexPainterMap.get(vid[1]);
     			Edge e = graph.findEdge(eid);
 	    		if (e == null) {
+	    			if (Console.exists()) {
+	    				Console.getInstance().log("Adding connection between " + vid[0] + " and " + vid[1] +
+	    						"\n    Message ID: " + ed.getMessageID());
+	    			}
 	    			addEdge(eid,vp1,vp2,ed.weight());
 	    		} else {
 	    			e.addWeight(ed.weight());
