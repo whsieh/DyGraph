@@ -207,6 +207,10 @@ public class GraphViewer extends JPanel {
         }
     }
     
+    public Graph getGraph() {
+    	return graph;
+    }
+    
     public void refreshVertexTable() {
         vertexTable = new CoordinateTable2D(new Rectangle(
                 -DEFAULT_WIDTH*SCREEN_SIZE_MULT,-DEFAULT_HEIGHT*SCREEN_SIZE_MULT,
@@ -299,14 +303,21 @@ public class GraphViewer extends JPanel {
         return null;
     }
     
-    protected void removeVertex(VertexPainter vp) {
+    public void removeVertex(VertexPainter vp) {
         if (graph.removeVertex(vp.id) != null) {
             vp.remove();
             vertexPainterMap.remove(vp.id);
         }
     }
     
-    protected void removeEdge(EdgePainter ep) {
+    public void removeVertex(String id) {
+        if (graph.removeVertex(id) != null) {
+            VertexPainter vp = vertexPainterMap.remove(id);
+            vp.remove();
+        }
+    }
+    
+    public void removeEdge(EdgePainter ep) {
         if (graph.removeEdge(ep.id) != null) {
             ep.remove();
         }

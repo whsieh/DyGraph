@@ -7,22 +7,33 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Vertex extends GraphItem implements Iterable<Edge>{
 
-    Map<Vertex,Edge> edges;
+    protected Map<Vertex,Edge> edges;
+    protected double weight;
     
-    protected Vertex(String id,Graph myGraph){
+    protected Vertex(String id,Graph myGraph) {
         super(id,myGraph);
         edges = new ConcurrentHashMap<Vertex,Edge>();
+    }
+    
+    public double weight() {
+    	return weight;
+    }
+    
+    public int degree() {
+    	return edges.size();
     }
     
     protected void disconnect() {
         for (Edge e : edges.values()) {
             myGraph.removeEdge(e.id);
         }
-    }    
+        weight = 0.0;
+    }
     
     protected void addEdge(Vertex v,Edge e) {
         if (edges.get(v) == null) {
             edges.put(v,e);
+            weight += e.weight;
         } else {
             throw GraphException.duplicate();
         }
@@ -31,6 +42,7 @@ public class Vertex extends GraphItem implements Iterable<Edge>{
     protected void removeEdge(Vertex v) {
         Edge e = edges.remove(v);
         if (e != null && e.isUndirected()) {
+        	weight -= e.weight;
             v.edges.remove(this);
         }
     }

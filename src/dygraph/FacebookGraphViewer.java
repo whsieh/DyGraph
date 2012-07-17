@@ -35,6 +35,14 @@ public class FacebookGraphViewer extends GraphViewer {
 		}
 	}
 	
+	public String whois(String id) {
+		FacebookVertexPainter vp = (FacebookVertexPainter)vertexPainterMap.get(id);
+		if (vp != null) {
+			return vp.getDisplayName();
+		}
+		return "<nobody>";
+	}
+	
 	@Override
 	protected void createContextMenu() {
 		

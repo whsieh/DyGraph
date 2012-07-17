@@ -24,7 +24,7 @@ import com.restfb.types.User;
 
 public class ProfileQueryEngine {
 	
-	final private static String DEFAULT_ACCESS_TOKEN = "AAACEdEose0cBAN6SuV4cUAbTNGfEOB2YZB8ZACLnIWM0rpKZAfDpBaqFQWzsGJX17TctUZAsAsGsv6pEe2zjEofWgFVhpaGsgKJ8pGfmAy8NQTaFlh6j";
+	final private static String DEFAULT_ACCESS_TOKEN = "AAAG4zd1akV4BAA1dEQlzuCIZBp46BrpO3nmGgodszuz4JBsVvqYe4ZBtkwkhVPJeV3YdwzJU5MHd3ZAJl0mb33LLr0JD0iOMLAqHDp98UOEnuNvWaVC";
 	public static FacebookClient FB = new DefaultFacebookClient(DEFAULT_ACCESS_TOKEN);
 	final static String DEFAULT_PICTURE_URL = "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-snc4/174597_20531316728_2866555_q.jpg";
 	final public static Map<String,String> MY_FRIENDS = new HashMap<String,String>(300);
@@ -48,14 +48,6 @@ public class ProfileQueryEngine {
 		ProfileQueryEngine pqe = new ProfileQueryEngine("1110316640");
 		List<Post> posts = pqe.fetchNextPosts();
 		for (Post post : posts) {
-			System.out.println(FacebookUtil.toGraphData(post) + "\n\n");
-		}
-		List<Post> posts2 = pqe.fetchNextPosts();
-		for (Post post : posts2) {
-			System.out.println(FacebookUtil.toGraphData(post) + "\n\n");
-		}
-		List<Post> posts3 = pqe.fetchNextPosts();
-		for (Post post : posts3) {
 			System.out.println(FacebookUtil.toGraphData(post) + "\n\n");
 		}
 	}

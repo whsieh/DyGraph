@@ -1,9 +1,14 @@
 package dygraph;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
+
+import model.graph.Graph;
+import model.graph.Vertex;
 
 import com.restfb.types.Post;
 
@@ -15,12 +20,12 @@ import gui.graph.GraphViewer;
 
 public class FacebookGraphPopulator extends GraphPopulator {
 
-	final static int SEARCH_DEPTH = 1;
-	final private Map<String,ProfileQueryEngine> profiles;
+	final static int SEARCH_DEPTH = 2;
+	final private Set<String> profiles;
 	
 	public FacebookGraphPopulator(GraphViewer view) {
 		super(view);
-		profiles = new HashMap<String,ProfileQueryEngine>();
+		profiles = new HashSet<String>();
 	}
 
 	private void iterateFacebookData(ProfileQueryEngine engine, Queue<String> queue) {
@@ -41,23 +46,22 @@ public class FacebookGraphPopulator extends GraphPopulator {
 		idQueue.add(ProfileQueryEngine.CURRENT_USER.key());
 		int queries = 1;
 		
-		while (queries < 20 && !idQueue.isEmpty()) {
+		while (queries < 50 && !idQueue.isEmpty()) {
 			
 			String id = idQueue.remove();
 			
 			ProfileQueryEngine engine;
-			if (profiles.containsKey(id)) {
-				engine = profiles.get(id);
+			if (profiles.contains(id)) {
+				continue;
 			} else {
 				engine = new ProfileQueryEngine(id);
-				profiles.put(id,engine);				
+				profiles.add(id);			
 			}
 			
 			for (int i = 0; i < SEARCH_DEPTH; i++) {
 				iterateFacebookData(engine, idQueue);
 				queries++;
 			}
-			
 		}
 	}
 

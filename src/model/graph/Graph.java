@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Graph implements Named,Iterable<Vertex>,Adaptable{
     
@@ -23,9 +24,17 @@ public class Graph implements Named,Iterable<Vertex>,Adaptable{
     protected String name;
     
     public Graph(String name) {
-        edgeMap = new LinkedHashMap<String,Edge>();
-        vertexMap = new LinkedHashMap<String,Vertex>();
+        edgeMap = new ConcurrentHashMap<String,Edge>();
+        vertexMap = new ConcurrentHashMap<String,Vertex>();
         this.name = name;
+    }
+    
+    public Set<String> vertexSet() {
+    	return vertexMap.keySet();
+    }
+    
+    public Set<String> edgeSet() {
+    	return edgeMap.keySet();
     }
     
     public Edge findEdge(String name) {

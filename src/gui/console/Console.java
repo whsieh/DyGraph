@@ -38,6 +38,11 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
+import dygraph.FacebookGraphViewer;
+
+import model.graph.Graph;
+import model.graph.Vertex;
+
 import stat.comm.CommunityTransformer;
 import stat.comm.Dendrogram;
 
@@ -139,10 +144,28 @@ public class Console extends JFrame {
 		}
 	}
 	
+	private void parseRemove(String[] in) {
+		if (in.length >= 2) {
+			if (in[1].equals("degree")) {
+				GraphViewer view = controller.getView();
+				Graph g = view.getGraph();
+				for (String id : g.vertexSet()) {
+					Vertex v = g.findVertex(id);
+					if (v.degree() <= 0) {
+						view.removeVertex(id);
+					}
+				}
+			}
+		}
+	}
+	
 	private void parse(String command) {
 		String[] in = command.split(" ");
 		if (in.length > 0 && !in[0].equals("")) {
 		switch(in[0]) {
+			case "threshold":
+				parseRemove(in);
+				break;
 			case "stat":
 				parseStat(in);
 				break;
@@ -154,6 +177,10 @@ public class Console extends JFrame {
 				break;
 			case "exit":
 				System.exit(0);
+			case "whois":
+				String id = in[1];
+				FacebookGraphViewer fgv = (FacebookGraphViewer)controller.getView();
+				log("Looking up id #" + id + ": " + fgv.whois(id));
 			default:
 				err("Unrecognized command: " + command);
 				break;
@@ -381,6 +408,7 @@ public class Console extends JFrame {
 		input.setColumns(10);
 		
 		log("Please note: this build has a ton of issues.\n   Hopefully vertices flying everywhere is not one of them.");
+		setState(Frame.ICONIFIED);
 	}
 	
 }

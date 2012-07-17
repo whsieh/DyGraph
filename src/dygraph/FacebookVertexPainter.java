@@ -26,6 +26,10 @@ public class FacebookVertexPainter extends VertexPainter{
 		this(graphPane, xPos, yPos, id, id);
 	}
 
+	protected String getDisplayName() {
+		return displayName;
+	}
+	
     FacebookVertexPainter(GraphViewer graphPane, int xPos, int yPos, String id, String displayName) {
         super(graphPane, xPos, yPos, id, displayName);
         image = ProfileQueryEngine.fetchPicture(id);
