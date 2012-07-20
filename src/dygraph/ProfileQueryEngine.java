@@ -30,7 +30,7 @@ public class ProfileQueryEngine {
 	final public static Map<String,String> MY_FRIENDS = new HashMap<String,String>(300);
 	public static Entry<String,String> CURRENT_USER;
 	
-	User me;
+	User user;
 	String profileID;
 	boolean isValid;
 	Iterator<List<Post>> myFeed;
@@ -55,7 +55,7 @@ public class ProfileQueryEngine {
 	ProfileQueryEngine(String profileID) {
 		this.profileID = profileID;
 		try {
-			me = FB.fetchObject(profileID,User.class);
+			user = FB.fetchObject(profileID,User.class);
 			isValid = true;
 		} catch (FacebookNetworkException e) {
 			isValid = false;

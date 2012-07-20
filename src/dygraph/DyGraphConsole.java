@@ -1,4 +1,4 @@
-package gui.console;
+package dygraph;
 
 import gui.graph.GraphController;
 import gui.graph.GraphViewer;
@@ -37,8 +37,8 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.text.DefaultCaret;
 
-import dygraph.FacebookGraphViewer;
 
 import model.graph.Graph;
 import model.graph.Vertex;
@@ -46,12 +46,12 @@ import model.graph.Vertex;
 import stat.comm.CommunityTransformer;
 import stat.comm.Dendrogram;
 
-public class Console extends JFrame {
+public class DyGraphConsole extends JFrame {
 
 	private final static String LOG_STRING = "$>";
 	private final static String ERR_STRING = "ERR>";
 	
-	private static Console CONSOLE;
+	private static DyGraphConsole CONSOLE;
 	
 	private JPanel contentPane;
 	private JTextField input;
@@ -77,7 +77,7 @@ public class Console extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	private Console() {
+	private DyGraphConsole() {
 		historyIndex = 0;
 		commandHistory = new ArrayList<String>(10);
 		commandHistory.add("");
@@ -89,13 +89,25 @@ public class Console extends JFrame {
 		log("Console initialized");
 	}
 	
+	public static void tryLog(String s) {
+		if (exists()) {
+			getInstance().log(s);
+		}
+	}
+	
+	public static void tryErr(String s) {
+		if (exists()) {
+			getInstance().err(s);
+		}
+	}
+	
 	public void setController(GraphController controller) {
 		this.controller = controller;
 	}
 
-	public static Console getInstance() {
+	public static DyGraphConsole getInstance() {
 		if (CONSOLE == null) {
-			CONSOLE = new Console();
+			CONSOLE = new DyGraphConsole();
 		}
 		return CONSOLE;		
 	}
@@ -105,7 +117,12 @@ public class Console extends JFrame {
 	}
 	
 	public void display() {
-		setVisible(true);
+		new Thread(new Runnable(){
+			@Override
+			public void run() {
+				setVisible(true);
+			}
+		}).start();
 	}
 	
 	public void log(String s) {
@@ -114,6 +131,8 @@ public class Console extends JFrame {
 		for (int i = 1; i < lines.length; i++) {
 			output.append("   " + lines[i] + "\n");
 		}
+        DefaultCaret caret = (DefaultCaret)output.getCaret();
+        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 	}
 	
 	public void err(String s) {
@@ -124,7 +143,7 @@ public class Console extends JFrame {
 		}
 	}
 	
-	private void parseStat(String[] in) {
+	private void stat(String[] in) {
 		if (controller != null) {
 			if (in.length == 1) {
 				log("Usage for \"stat\":\n" + 
@@ -133,7 +152,12 @@ public class Console extends JFrame {
 				if (in[1].equals("comm")) {
 					log("Running community detection algorithm...");
 					long start = System.nanoTime();
-					Dendrogram result = new CommunityTransformer().transform(controller.getModel());
+					Dendrogram result;
+					if (in.length == 3) {
+						result = new CommunityTransformer().transform(controller.getModel(),in[2]);
+					} else {
+						result = new CommunityTransformer().transform(controller.getModel());
+					}
 					int end = (int)((System.nanoTime() - start)/1000000.0);
 					log(result.toString());
 					log("Time taken: " + end + " ms");
@@ -144,14 +168,14 @@ public class Console extends JFrame {
 		}
 	}
 	
-	private void parseRemove(String[] in) {
-		if (in.length >= 2) {
+	private void threshold(String[] in) {
+		if (in.length > 1) {
 			if (in[1].equals("degree")) {
 				GraphViewer view = controller.getView();
 				Graph g = view.getGraph();
-				for (String id : g.vertexSet()) {
+				for (String id : g.vertices()) {
 					Vertex v = g.findVertex(id);
-					if (v.degree() <= 0) {
+					if (v.degree() <= 1.0) {
 						view.removeVertex(id);
 					}
 				}
@@ -164,10 +188,10 @@ public class Console extends JFrame {
 		if (in.length > 0 && !in[0].equals("")) {
 		switch(in[0]) {
 			case "threshold":
-				parseRemove(in);
+				threshold(in);
 				break;
 			case "stat":
-				parseStat(in);
+				stat(in);
 				break;
 			case "cls":
 				output.setText("");
@@ -177,10 +201,13 @@ public class Console extends JFrame {
 				break;
 			case "exit":
 				System.exit(0);
-			case "whois":
-				String id = in[1];
-				FacebookGraphViewer fgv = (FacebookGraphViewer)controller.getView();
-				log("Looking up id #" + id + ": " + fgv.whois(id));
+			case "who":
+				for (int i = 1; i < in.length; i++) {
+					String id = in[i].replaceAll(",","");
+					DygraphViewer fgv = (DygraphViewer)controller.getView();
+					log("Looking up id #" + id + ": " + fgv.whois(id));
+				}
+				break;
 			default:
 				err("Unrecognized command: " + command);
 				break;
@@ -406,6 +433,9 @@ public class Console extends JFrame {
 		gbc_input.gridy = 2;
 		contentPane.add(input, gbc_input);
 		input.setColumns(10);
+		
+        DefaultCaret caret = (DefaultCaret)output.getCaret();
+        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 		
 		log("Please note: this build has a ton of issues.\n   Hopefully vertices flying everywhere is not one of them.");
 		setState(Frame.ICONIFIED);

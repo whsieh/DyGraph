@@ -5,17 +5,22 @@ import gui.graph.GraphViewer;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseWheelEvent;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import javax.swing.JApplet;
 
-import dygraph.FacebookGraphPopulator;
+import dygraph.DygraphPopulator;
 
 import stat.comm.CommunityTransformer;
 
-public class FacebookGraphController extends GraphController<FacebookGraphViewer>{
+public class DygraphController extends GraphController<DygraphViewer> {
     
+	private DygraphApplet applet;
     
-    public FacebookGraphController(JApplet root) {
+    public DygraphController(JApplet root, DygraphApplet applet) {
         super(root);
+        this.applet = applet;
     }
     
     @Override
@@ -23,15 +28,23 @@ public class FacebookGraphController extends GraphController<FacebookGraphViewer
         super.handleKeyPressed(e);
         view.dragView(e);
     }
+    
+    public void popURL(String url) {
+    	try {
+			applet.popURL(new URL(url));
+		} catch (MalformedURLException e) {
+			DyGraphConsole.tryErr("Failed to popup new URL (" + url + ")");
+		}
+    }
 
     @Override
     protected void createViewer() {
-    	view = new FacebookGraphViewer(this);
+    	view = new DygraphViewer(this);
     }
     
     @Override
     public void launch() {
-        this.setPopulator(new FacebookGraphPopulator(view));
+        this.setPopulator(new DygraphPopulator(view));
         view.activate();
         /*
         try {

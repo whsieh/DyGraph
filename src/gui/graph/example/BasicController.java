@@ -5,10 +5,12 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseWheelEvent;
 import javax.swing.JApplet;
 
-import dygraph.FacebookGraphPopulator;
+import dygraph.DygraphPopulator;
+import dygraph.DygraphViewer;
 
 import stat.comm.CommunityTransformer;
 
+@Deprecated
 public class BasicController extends GraphController{
     
     
@@ -24,7 +26,7 @@ public class BasicController extends GraphController{
 
     @Override
     public void launch() {
-        this.setPopulator(new FacebookGraphPopulator(view));
+        this.setPopulator(new DygraphPopulator((DygraphViewer)view));
         view.activate();
         /*
         try {

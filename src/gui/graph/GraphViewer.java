@@ -46,9 +46,9 @@ public class GraphViewer extends JPanel {
     protected JMenuItem[] VERTEX_MENUITEMS;
     protected JMenuItem[] EDGE_MENUITEMS;
 
-    protected static float repulsive_constant = (float)Math.pow(2,3);
-    protected static float equilibrium_length = 20;
-    protected static int unit_mass = 400;
+    protected static float repulsive_constant = (float)Math.pow(2,12);
+    protected static float equilibrium_length = 0;
+    protected static int unit_mass = 512;
     
     protected boolean currentlyAddingEdge;
     
@@ -92,7 +92,6 @@ public class GraphViewer extends JPanel {
                 BorderFactory.createBevelBorder(BevelBorder.LOWERED)));
         popupX = 0;
         popupY = 0;
-
         createContextMenu();
     }
     
@@ -180,10 +179,20 @@ public class GraphViewer extends JPanel {
     public Dimension getPreferredSize() {
         return new Dimension(DEFAULT_WIDTH,DEFAULT_HEIGHT);
     }
-    
+
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
+        paintFrame(g);
+    }
+
+    @Override
+    public void update(Graphics g) {
+        paint(g);
+    } 
+    
+    public void paintFrame(Graphics g) {
+    	
         for(EdgePainter ep : edgeList) {
             ep.paint(g);
         }

@@ -5,6 +5,7 @@ import gui.graph.GraphPopulator;
 import gui.graph.GraphViewer;
 import dygraph.FacebookGraphData;
 
+@Deprecated
 public class RandomCommunityPopulator extends GraphPopulator {
 
 	final static int NUM_COMMUNITIES = 4;

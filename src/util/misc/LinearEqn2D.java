@@ -20,7 +20,7 @@ public class LinearEqn2D {
         this.b = b;
         this.x = new float[] {(float)Double.NEGATIVE_INFINITY,(float)Double.POSITIVE_INFINITY};
         this.y = new float[] {(float)Double.NEGATIVE_INFINITY,(float)Double.POSITIVE_INFINITY};
-        this.margin = 7.5f;
+        this.margin = 10f;
     }
     
     public LinearEqn2D(float[] xBounds, float[] yBounds){

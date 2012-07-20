@@ -51,7 +51,7 @@ public abstract class AbstractPainter {
     
     protected abstract void paintSelected(Graphics g);
     
-    static Image transformWhiteToTransparency(BufferedImage image) {
+    public static Image transformWhiteToTransparency(BufferedImage image) {
         ImageFilter filter = new RGBImageFilter(){
             @Override
             public final int filterRGB(int x, int y, int rgb){

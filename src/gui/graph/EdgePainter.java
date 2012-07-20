@@ -54,6 +54,10 @@ public class EdgePainter extends AbstractPainter implements ISpringController,IM
         currentLength = equilibrium;
     }
     
+    public VertexPainter[] getConnectingVertices() {
+    	return new VertexPainter[] {vp1,vp2};
+    }
+    
     private void updateVertices() {
         vp1.myEdges.add(this);
         vp2.myEdges.add(this);
@@ -115,7 +119,7 @@ public class EdgePainter extends AbstractPainter implements ISpringController,IM
     }
 
     private void paintLine(Graphics g, Color c) {
-
+    	
         Graphics2D g2d = (Graphics2D)g;
         
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -125,7 +129,11 @@ public class EdgePainter extends AbstractPainter implements ISpringController,IM
         Color origColor = g.getColor();
         
         g.setColor(c);
-        g2d.setStroke(new BasicStroke(2));
+        if (state == AbstractPainter.DEFAULT) {
+        	g2d.setStroke(new BasicStroke(2));
+        } else {
+        	g2d.setStroke(new BasicStroke(4));
+        }
         
         g.drawLine(vp1.x,vp1.y,vp2.x,vp2.y);
         

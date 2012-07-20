@@ -1,11 +1,14 @@
 
 package dygraph;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
+import java.util.HashSet;
+import java.util.Set;
 
-import gui.console.Console;
 import gui.graph.example.*;
 
 import javax.swing.JApplet;
@@ -13,13 +16,12 @@ import javax.swing.JApplet;
 import com.restfb.DefaultFacebookClient;
 
 
-public class DygraphApplet extends JApplet{
+final public class DygraphApplet extends JApplet{
     
 	final static int DEFAULT_WIDTH = 1600;
 	final static int DEFAULT_HEIGHT = 900;
-	final static String DEBUG_TOKEN = "AAAG4zd1akV4BAPsAEdtbI12shZAoO2xVm3WyolNPK6DtHRsGmi1ww2B3BEsaV7oiAITbIaKWO0lUdlKQhgbBFglzCQQ2PXMSWqwl9eF94llgRDZAO7";
-									
-	FacebookGraphController c;
+	final static String DEBUG_TOKEN = "AAACEdEose0cBAJ3lu8xQuC2hfHZAE4QFQVCVZBzCLexAalRMTxmSZC2iBd3YmOdS0ZCZBXDZBGokEsGdGCZB3qEgpmql9ZAX6dEUmP5NZAqgapZCEbiEcQSHy0";
+	DygraphController c;
 	
     @Override
     public void init() {
@@ -39,6 +41,10 @@ public class DygraphApplet extends JApplet{
     	}
     }
     
+    public void popURL(URL url) {
+		getAppletContext().showDocument(url, "_blank");
+    }
+    
     private void launchNewController() {
     	final JApplet dygraph = this;
 		dygraph.setSize(1600,900);
@@ -51,10 +57,10 @@ public class DygraphApplet extends JApplet{
     		ProfileQueryEngine.FB = new DefaultFacebookClient(DEBUG_TOKEN);
     	}
     	ProfileQueryEngine.fetchFriendData();
-        c = new FacebookGraphController(dygraph);
+        c = new DygraphController(dygraph,this);
         c.launch();
-        Console.getInstance().display();
-        Console.getInstance().setController(c);
+        DyGraphConsole.getInstance().display();
+        DyGraphConsole.getInstance().setController(c);
     }
     
     @Override

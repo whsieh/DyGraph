@@ -182,6 +182,12 @@ public abstract class GraphController<T extends GraphViewer> {
             view.currentlyFocused.inform(Message.MOUSE_EXITED, new Data(e));
             view.currentlyFocused = null;
         }
+        if (view.currentlySelected != null) {
+        	if (!(e.getX() == view.curX && e.getY() == view.curY)) {
+	        	view.currentlySelected.inform(Message.MOUSE_DESELECTED, new Data(e));
+	        	view.currentlySelected = null;
+        	}
+        }
     }
     public void handleMouseClicked(MouseEvent e) {    
         view.requestFocus();

@@ -20,7 +20,8 @@ final public class FacebookUtil {
 		/* 'data': the GraphData object that the GraphViewer will 'ask' for information about
 		 * which vertices and edges it needs to instantiate */
 		FacebookGraphData data = new FacebookGraphData();
-		if (post.getMessage() != null && !post.getMessage().contains("bday") && !post.getMessage().contains("birthday")) {
+		String msg = post.getMessage();
+		if (msg != null && !msg.toLowerCase().contains("bday") && !msg.toLowerCase().contains("birthday")) {
 			/* 'from': this post's author */
 			NamedFacebookType from = post.getFrom();
 			/* If the author of this post is one of my friends... */

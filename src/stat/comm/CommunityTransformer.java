@@ -1,8 +1,11 @@
 package stat.comm;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Set;
 
 import model.graph.Edge;
 import model.graph.Graph;
@@ -82,8 +85,11 @@ public class CommunityTransformer implements IStatTransformer<Dendrogram>{
 		AdjacencyList adj = g.adaptTo(AdjacencyList.class);
 		/* Compute the modularity matrix from the adj. list */
 		Matrix Q_mat = computeModMatrix(adj);
+		/* Create a new set containing all of the vertices in g */
+		Set<String> vertices = new HashSet<String>();
+		vertices.addAll(g.vertices());
 		/* Create the dendrogram object with all vertices */
-		Dendrogram root = new Dendrogram(g.vertices());
+		Dendrogram root = new Dendrogram(vertices);
 		/* Initialize the breadth-first queue */
 		Queue<Dendrogram> queue = new LinkedList<Dendrogram>();
 		/* Add the root to the queue */

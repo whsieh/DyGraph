@@ -8,7 +8,7 @@ import com.restfb.FacebookClient;
 import com.restfb.types.Comment;
 import com.restfb.types.Post;
 
-public class FacebookFeedQuerying {
+public class FacebookFeedExample {
 
     
     /**

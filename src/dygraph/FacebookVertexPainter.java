@@ -21,13 +21,12 @@ public class FacebookVertexPainter extends VertexPainter{
     protected BufferedImage image;
     protected int width;
     protected int height;
-        
+    
+    protected volatile boolean isLoading;
+	private int degree = 0;
+    
 	FacebookVertexPainter(GraphViewer graphPane, int xPos, int yPos, String id) {
 		this(graphPane, xPos, yPos, id, id);
-	}
-
-	protected String getDisplayName() {
-		return displayName;
 	}
 	
     FacebookVertexPainter(GraphViewer graphPane, int xPos, int yPos, String id, String displayName) {
@@ -36,6 +35,21 @@ public class FacebookVertexPainter extends VertexPainter{
         this.width = image.getWidth();
         this.height = image.getHeight();
     }
+    
+	protected String getDisplayName() {
+		return displayName;
+	}
+	
+	public void setLoading(boolean isLoading) {
+		this.isLoading = isLoading;
+		if (!isLoading) {
+			degree = 0;
+		}
+	}
+	
+	public boolean isLoading() {
+		return isLoading;
+	}
     
     @Override
     protected void paintDefault(Graphics g) {
@@ -50,7 +64,11 @@ public class FacebookVertexPainter extends VertexPainter{
         paintProfilePicture(g2d, STATE_COLORS[AbstractPainter.FOCUSED][0],
         STATE_COLORS[AbstractPainter.FOCUSED][1]);
     }
-
+    
+    protected String getID() {
+    	return id;
+    }
+    
     @Override
     protected void paintSelected(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
@@ -79,9 +97,15 @@ public class FacebookVertexPainter extends VertexPainter{
         g2d.drawRoundRect(x - 2 - halfWidth, y - 2 - halfHeight, width+2, height+2,5,5);
         
         g2d.setColor(cOuter);
-        g2d.setStroke(new BasicStroke(4));
+    	
+        if (isLoading) {
+        	g2d.setStroke(new BasicStroke(8));
+        } else {
+        	g2d.setStroke(new BasicStroke(4));
+        }
+        
         g2d.drawRoundRect(x - 2 - halfWidth, y - 2 - halfHeight, width+2, height+2,5,5);
-
+        
         g2d.drawImage(image, x - halfWidth, y - halfHeight,	myParent);
         
         g2d.drawString(displayName, x - halfWidth, y + halfHeight + 15);

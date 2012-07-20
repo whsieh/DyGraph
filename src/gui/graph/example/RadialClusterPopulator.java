@@ -3,6 +3,7 @@ package gui.graph.example;
 import gui.graph.*;
 import gui.graph.util.IDCounter;
 
+@Deprecated
 public class RadialClusterPopulator extends GraphPopulator {
 
     int clusterSize;
