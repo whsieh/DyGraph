@@ -40,11 +40,11 @@ public class Edge extends GraphItem {
         return type;
     }
     
-    public void setWeight(double weight) {
+    public void setWeight(float weight) {
     	this.weight = weight;
     }
     
-    public void addWeight(double weight) {
+    public void addWeight(float weight) {
     	this.weight += weight;
     }
     

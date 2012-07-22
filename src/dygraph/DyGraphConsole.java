@@ -436,8 +436,6 @@ public class DyGraphConsole extends JFrame {
 		
         DefaultCaret caret = (DefaultCaret)output.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-		
-		log("Please note: this build has a ton of issues.\n   Hopefully vertices flying everywhere is not one of them.");
 		setState(Frame.ICONIFIED);
 	}
 	

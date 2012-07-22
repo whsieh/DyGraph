@@ -54,6 +54,7 @@ public class GraphViewer extends JPanel {
     
     protected CoordinateTable2D<VertexPainter> vertexTable;
     protected Map<String,VertexPainter> vertexPainterMap;
+    protected Map<String,EdgePainter> edgePainterMap;
     protected DLinkedList<VertexPainter> vertexList;
     protected AbstractPainter currentlyFocused,currentlySelected,currentlyDragged;
     protected DLinkedList<EdgePainter> edgeList;
@@ -86,6 +87,7 @@ public class GraphViewer extends JPanel {
         vertexTable = new CoordinateTable2D(bounds);
         vertexList = new DLinkedList<VertexPainter>();
         vertexPainterMap = new HashMap<String,VertexPainter>();
+        edgePainterMap = new HashMap<String,EdgePainter>();
         edgeList = new DLinkedList<EdgePainter>();
         this.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createBevelBorder(BevelBorder.RAISED),
@@ -243,11 +245,13 @@ public class GraphViewer extends JPanel {
     		if (graph.findVertex(vid[0]) != null && graph.findVertex(vid[1]) != null) {
     			VertexPainter vp1 = vertexPainterMap.get(vid[0]);
     			VertexPainter vp2 = vertexPainterMap.get(vid[1]);
+    			EdgePainter ep = edgePainterMap.get(eid);
     			Edge e = graph.findEdge(eid);
-	    		if (e == null) {
+	    		if (e == null && ep == null) {
 	    			addEdge(eid,vp1,vp2,ed.weight());
-	    		} else {
+	    		} else if (e != null && ep != null){
 	    			e.addWeight(ed.weight());
+	    			ep.addWeight(ed.weight());
 	    		}
     		}
     	}
@@ -354,18 +358,19 @@ public class GraphViewer extends JPanel {
     public EdgePainter addEdge(String id, VertexPainter vp1, VertexPainter vp2){
         try {
             String eName = "<" + vp1.id + "," + vp2.id + ">";
-            return addEdge(eName,vp1,vp2,1.0);
+            return addEdge(eName,vp1,vp2,1.0f);
         } catch (Exception e) {
             System.err.println(e);
             return null;
         }
     }
     
-    public EdgePainter addEdge(String id, VertexPainter vp1, VertexPainter vp2, double weight){
+    public EdgePainter addEdge(String id, VertexPainter vp1, VertexPainter vp2, float weight){
         try {
             graph.addEdge(id, vp1.id,vp2.id,Edge.UNDIRECTED, weight);
-            EdgePainter e = new EdgePainter(this,vp1,vp2,id);
+            EdgePainter e = new EdgePainter(this,vp1,vp2,id, weight);
             edgeList.insertBack(e);
+            edgePainterMap.put(id,e);
             e.myListNode = edgeList.back();
             return e;
         } catch (Exception e) {
@@ -377,7 +382,7 @@ public class GraphViewer extends JPanel {
     public EdgePainter addEdge(VertexPainter vp1, VertexPainter vp2){
         try {
             String eName = "<" + vp1.id + "," + vp2.id + ">";
-            return addEdge(eName,vp1,vp2,1.0);
+            return addEdge(eName,vp1,vp2,1.0f);
         } catch (Exception e) {
             System.err.println(e);
             return null;

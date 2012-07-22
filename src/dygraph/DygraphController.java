@@ -24,6 +24,19 @@ public class DygraphController extends GraphController<DygraphViewer> {
     }
     
     @Override
+    public boolean newEdgeEnabled() {
+    	return false;
+    }
+    
+    @Override
+    public void handleMouseWheelMoved(MouseWheelEvent e) {
+    	repulsiveConstant -= e.getWheelRotation()*500;
+    	if (repulsiveConstant < 0) {
+    		repulsiveConstant = 0;
+    	}
+    }
+    
+    @Override
     public void handleKeyPressed(KeyEvent e) {
         super.handleKeyPressed(e);
         view.dragView(e);

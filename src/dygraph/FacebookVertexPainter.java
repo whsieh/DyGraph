@@ -13,6 +13,8 @@ import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.image.BufferedImage;
 
+import util.misc.ImageLibrary;
+
 public class FacebookVertexPainter extends VertexPainter{
 
 	// TODO profile pic painting, (EDITED: don't worry about the mouseover effect thing. That'll make things
@@ -107,6 +109,10 @@ public class FacebookVertexPainter extends VertexPainter{
         g2d.drawRoundRect(x - 2 - halfWidth, y - 2 - halfHeight, width+2, height+2,5,5);
         
         g2d.drawImage(image, x - halfWidth, y - halfHeight,	myParent);
+        
+        if (isLoading) {
+        	g2d.drawImage(ImageLibrary.grabImage("http://dygraph.herobo.com/img/green_plus.png", true), x+halfWidth, y-halfHeight-25, myParent);
+        }
         
         g2d.drawString(displayName, x - halfWidth, y + halfHeight + 15);
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,

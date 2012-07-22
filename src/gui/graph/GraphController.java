@@ -144,15 +144,15 @@ public abstract class GraphController<T extends GraphViewer> {
         }
     }
     
-    public <TYPE> TYPE getData(String id, String key) {
+    public <T> T getData(String id, String key) {
     	try {
-    		return (TYPE)graph.find(id).getData(key);
+    		return (T)graph.find(id).getData(key);
     	} catch (ClassCastException e){
     		System.err.println("Invalid class type when extracting: " +
     				key + " from " + id);
     		return null;
     	} catch (NullPointerException e) {
-    		System.err.println("Invalid node identifier: " + id);
+    		System.err.println("Invalid identifier: " + id);
     		return null;
     	}
     }
@@ -161,13 +161,13 @@ public abstract class GraphController<T extends GraphViewer> {
     	try {
     		graph.find(id).setData(key,o);
     	} catch (NullPointerException e) {
-    		System.err.println("Invalid node identifier: " + id);
+    		System.err.println("Invalid identifier: " + id);
     	}
     }
     
     public void handleMouseWheelMoved(MouseWheelEvent e) {
         if (e.isControlDown()) {
-            repulsiveConstant *= (Math.pow(2,-0.5*e.getWheelRotation()));
+            repulsiveConstant -= e.getWheelRotation()*20;
         } else if (e.isShiftDown() ) {
             unitMass -= e.getWheelRotation() * 10;
         }else {
@@ -215,7 +215,7 @@ public abstract class GraphController<T extends GraphViewer> {
                 }
                 view.currentlySelected = node;
                 node.inform(Message.MOUSE_CLICKED,new Data(e));
-                if (e.isShiftDown()) {
+                if (e.isShiftDown()  && newEdgeEnabled()) {
                     view.currentlyAddingEdge = true;
                 }
             }
@@ -250,7 +250,7 @@ public abstract class GraphController<T extends GraphViewer> {
         } else {
             VertexPainter node = view.locateVertexPainter(e.getX(),e.getY());
             if (view.currentlyDragged != null) {
-              view.currentlyDragged.inform(Message.MOUSE_DRAGGED, new Data(e));  
+              view.currentlyDragged.inform(Message.MOUSE_DRAGGED, new Data(e));
             } else if (node != null) {
                 node.inform(Message.MOUSE_DRAGGED, new Data(e));
                 view.currentlyDragged = node;
@@ -285,6 +285,10 @@ public abstract class GraphController<T extends GraphViewer> {
         view.curX = e.getX();
         view.curY = e.getY();
 
+    }
+    
+    public boolean newEdgeEnabled() {
+    	return true;
     }
     
     static private void setLookAndFeel(String style1, String style2){

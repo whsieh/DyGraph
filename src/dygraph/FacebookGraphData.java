@@ -11,8 +11,8 @@ import java.util.Set;
 
 public class FacebookGraphData extends GraphData <FacebookGraphData.FacebookVertexData,FacebookGraphData.FacebookEdgeData> {
 
-	static final public double COMMENT_WEIGHT = 0.2;
-	static final public double POST_WEIGHT = 1.0;
+	static final public float COMMENT_WEIGHT = 0.2f;
+	static final public float POST_WEIGHT = 1.0f;
 	
 	@Override
 	public void addVertexData(List<String> args) {
@@ -30,11 +30,11 @@ public class FacebookGraphData extends GraphData <FacebookGraphData.FacebookVert
 	public void addEdgeData(List<String> args) {
 		
 		if (args.size() >= 4 && !args.get(0).equals(args.get(1)) ) {
-			getEdgeInfo().add(new FacebookEdgeData(args.get(0),args.get(1),args.get(2),Double.parseDouble(args.get(3))));
+			getEdgeInfo().add(new FacebookEdgeData(args.get(0),args.get(1),args.get(2),Float.parseFloat(args.get(3))));
 		}
 	}
 	
-	public void addEdgeData(String user1, String user2, String message, double weight) {
+	public void addEdgeData(String user1, String user2, String message, float weight) {
 		
 		if (!user1.equals(user2)) {
 			getEdgeInfo().add(new FacebookEdgeData(user1, user2, message,weight));
@@ -68,9 +68,9 @@ public class FacebookGraphData extends GraphData <FacebookGraphData.FacebookVert
 
 		String messageID;
 		String id,user1,user2;
-		double weight;
+		float weight;
 		
-		FacebookEdgeData(String user1, String user2, String mID, double weight) {
+		FacebookEdgeData(String user1, String user2, String mID, float weight) {
 			
 			if (user1.compareTo(user2) < 0) {
 				id = user1 + "_" + user2;
@@ -112,7 +112,7 @@ public class FacebookGraphData extends GraphData <FacebookGraphData.FacebookVert
 		}
 
 		@Override
-		public double weight() {
+		public float weight() {
 			return weight;
 		}
 	}

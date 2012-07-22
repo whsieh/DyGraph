@@ -21,7 +21,7 @@ import gui.graph.GraphViewer;
 public class DygraphPopulator extends GraphPopulator {
 
 	final static int SEARCH_DEPTH = 2;
-	final static int SEARCH_VOLUME = 80;
+	final static int SEARCH_VOLUME = 25;
 	final Set<String> mentioned = new HashSet<String>(200);
 	
 	public DygraphPopulator(DygraphViewer view) {
@@ -58,7 +58,7 @@ public class DygraphPopulator extends GraphPopulator {
 				mentioned.add(id);
 				ProfileQueryEngine engine = fbView.getProfile(id);
 				if (DyGraphConsole.exists()) {
-					DyGraphConsole.getInstance().log("Currently on query No. " + queries + ": " + engine.user.getName());
+					DyGraphConsole.getInstance().log("Currently on query " + queries + "/" + SEARCH_VOLUME + ", " + engine.user.getName());
 				}
 				FacebookVertexPainter vp = fbView.getFacebookProfilePainter(id);
 				if (vp != null) {

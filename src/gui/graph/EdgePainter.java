@@ -33,12 +33,18 @@ public class EdgePainter extends AbstractPainter implements ISpringController,IM
     ListNode myListNode;
     
     /* Physics-related components */
+    float weight;
     float k;
     float equilibrium;
     volatile float currentLength;
 
     
     public EdgePainter(GraphViewer graphPane,VertexPainter vp1, VertexPainter vp2,String label){
+        
+        this(graphPane,vp1, vp2,label,1.0f);
+    }
+    
+    public EdgePainter(GraphViewer graphPane,VertexPainter vp1, VertexPainter vp2,String label, float weight){
         
         /* Initializing graph-related components */
         this.myParent = graphPane;
@@ -47,11 +53,20 @@ public class EdgePainter extends AbstractPainter implements ISpringController,IM
         this.eqn = new LinearEqn2D(vp1.x,vp1.y,vp2.x,vp2.y);
         this.updateVertices();
         this.id = label;
+        this.weight = weight;
         
         /* Initializing physics-related components */
         k = ISpringController.DEFAULT_K; // Change to scale to edge weight.
         equilibrium = myParent.controller.equilibriumLength;
         currentLength = equilibrium;
+    }
+    
+    public void setWeight(float weight) {
+    	this.weight = weight;
+    }
+    
+    public void addWeight(float weight) {
+    	this.weight += weight;
     }
     
     public VertexPainter[] getConnectingVertices() {

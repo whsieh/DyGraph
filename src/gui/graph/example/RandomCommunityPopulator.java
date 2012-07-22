@@ -36,14 +36,14 @@ public class RandomCommunityPopulator extends GraphPopulator {
 				for (int index2 = index1+1; index2 < COMMUNITY_SIZE; index2++) {
 					if (Math.random() < 0.75) {
 						data.addEdgeData(communityVertices[index1], communityVertices[index2],
-								"testing", 1.0);
+								"testing", 1.0f);
 					}
 				}
 				for (int comm2 = comm1+1; comm2 < NUM_COMMUNITIES; comm2++) {
 					for (int index2 = 0; index2 < COMMUNITY_SIZE; index2++) {
 						if (Math.random() < 0.01) {
 							data.addEdgeData(vertices[comm1][index1], vertices[comm2][index2],
-									"testing", 1.0);
+									"testing", 1.0f);
 						}
 					}
 				}

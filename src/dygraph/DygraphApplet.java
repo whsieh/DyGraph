@@ -20,7 +20,7 @@ final public class DygraphApplet extends JApplet{
     
 	final static int DEFAULT_WIDTH = 1600;
 	final static int DEFAULT_HEIGHT = 900;
-	final static String DEBUG_TOKEN = "AAACEdEose0cBAJ3lu8xQuC2hfHZAE4QFQVCVZBzCLexAalRMTxmSZC2iBd3YmOdS0ZCZBXDZBGokEsGdGCZB3qEgpmql9ZAX6dEUmP5NZAqgapZCEbiEcQSHy0";
+	final static String DEBUG_TOKEN = "AAACEdEose0cBAE8HZCF6fbifbMwIsqJPLP0ixvfPPQZAMDgXHQK3d9hyCeiDhVzGIE9HQg3sRr8v4Q4cbl2NxlhfUfXGBhMponUO4x9DvC6bd0p8o0";
 	DygraphController c;
 	
     @Override

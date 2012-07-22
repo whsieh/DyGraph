@@ -16,6 +16,7 @@ import com.restfb.types.Post;
 import dygraph.FacebookGraphData.FacebookEdgeData;
 import dygraph.FacebookGraphData.FacebookVertexData;
 import model.graph.Edge;
+import model.graph.Vertex;
 import gui.graph.EdgePainter;
 import gui.graph.GraphController;
 import gui.graph.GraphData;
@@ -63,9 +64,11 @@ public class DygraphViewer extends GraphViewer {
 	@Override
 	protected void createContextMenu() {
 		
+		WHITESPACE_POPUPMENU = new JPopupMenu();
         VERTEX_POPUPMENU = new JPopupMenu();
         EDGE_POPUPMENU = new JPopupMenu();
         
+        WHITESPACE_MENUITEMS = new JMenuItem[] {new JMenuItem("Prune connections")};
         VERTEX_MENUITEMS = new JMenuItem[] {new JMenuItem("Visit profile"),
         		new JMenuItem("Expand connections")};
         EDGE_MENUITEMS = new JMenuItem[] {new JMenuItem("See friendship")};
@@ -76,12 +79,35 @@ public class DygraphViewer extends GraphViewer {
         for(int i = 0; i < EDGE_MENUITEMS.length; i++) {
             EDGE_POPUPMENU.add(EDGE_MENUITEMS[i]);
         }
+        for(int i = 0; i < WHITESPACE_MENUITEMS.length; i++) {
+        	WHITESPACE_POPUPMENU.add(WHITESPACE_MENUITEMS[i]);
+        }
         this.setBackground(Color.WHITE);
+        
+        WHITESPACE_MENUITEMS[0].addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+        		int deltaCount = 0;
+        		do {
+        			deltaCount = 0;
+        			for (String id : graph.vertices()) {
+        				Vertex v = graph.findVertex(id);
+        				if (v.degree() <= 1.0) {
+        					deltaCount++;
+        					removeVertex(id);
+        				}
+        			}
+        		} while(deltaCount > 0);
+            }
+        });
         
         VERTEX_MENUITEMS[0].addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 FacebookVertexPainter fbVertex = ((FacebookVertexPainter)currentlySelected);
+                if (fbVertex == null) {
+                	fbVertex = ((FacebookVertexPainter)currentlyFocused);
+                }
                 ((DygraphController)controller).popURL("http://www.facebook.com/" + fbVertex.getID());
             }
         });
@@ -89,8 +115,11 @@ public class DygraphViewer extends GraphViewer {
             @Override
             public void actionPerformed(ActionEvent e) {
                 FacebookVertexPainter fbVertex = ((FacebookVertexPainter)currentlySelected);
+                if (fbVertex == null) {
+                	fbVertex = ((FacebookVertexPainter)currentlyFocused);
+                }
                 if (fbVertex != null) {
-                	expandProfileConnections(fbVertex.getID());
+                	expandProfileConnections(fbVertex.getID(),5);
                 }
             }
         });
@@ -133,6 +162,26 @@ public class DygraphViewer extends GraphViewer {
 		}).start();
 	}
 	
+	public void expandProfileConnections(final String id, final int count) {
+		new Thread(new Runnable(){
+			@Override
+			public void run() {
+				ProfileQueryEngine engine = getProfile(id);
+				if (engine != null) {
+					FacebookVertexPainter fbvp = (FacebookVertexPainter)vertexPainterMap.get(id);
+					for (int i = 0; i < count; i++) {
+						fbvp.setLoading(true);
+						for (Post post : engine.fetchNextPosts()) {
+							FacebookGraphData data = FacebookUtil.toGraphData(post);
+							addFacebookGraphData(data);
+						}
+						fbvp.setLoading(false);
+					}
+				}
+			}
+		}).start();
+	}
+	
     private void addFacebookGraphData(FacebookGraphData data) {
     	for (FacebookVertexData vd : data.getVertexInfo()) {
     		String vid = vd.getID();
@@ -150,15 +199,13 @@ public class DygraphViewer extends GraphViewer {
     		if (graph.findVertex(vid[0]) != null && graph.findVertex(vid[1]) != null) {
     			VertexPainter vp1 = vertexPainterMap.get(vid[0]);
     			VertexPainter vp2 = vertexPainterMap.get(vid[1]);
+    			EdgePainter ep = edgePainterMap.get(eid);
     			Edge e = graph.findEdge(eid);
-	    		if (e == null) {
-	    			if (DyGraphConsole.exists()) {
-	    				DyGraphConsole.getInstance().log("Adding connection between " + vid[0] + " and " + vid[1] +
-	    						"\n    Message ID: " + ed.getMessageID());
-	    			}
+	    		if (e == null && ep == null) {
 	    			addEdge(eid,vp1,vp2,ed.weight());
-	    		} else {
+	    		} else if (e != null && ep != null){
 	    			e.addWeight(ed.weight());
+	    			ep.addWeight(ed.weight());
 	    		}
     		}
     	}

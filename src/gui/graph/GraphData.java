@@ -47,6 +47,6 @@ abstract public class GraphData <V extends GraphData.IVertexData, E extends Grap
 		
 		String getID();
 		String[] getVertexID();
-		double weight();
+		float weight();
 	}
 }

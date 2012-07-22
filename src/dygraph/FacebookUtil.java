@@ -41,6 +41,7 @@ final public class FacebookUtil {
 						data.addEdgeData(from.getId(),user.getId(),post.getMessage(),FacebookGraphData.POST_WEIGHT);
 					}
 				}
+				/*
 				for (Comment comment : post.getComments().getData()) {
 					NamedFacebookType commentFrom = comment.getFrom();
 					if (!mentioned.contains(commentFrom.getId()) && 
@@ -56,6 +57,7 @@ final public class FacebookUtil {
 						data.addEdgeData(commentFrom.getId(), from.getId() , comment.getMessage(), FacebookGraphData.COMMENT_WEIGHT);
 					}
 				}
+				*/
 			}
 		}
 		return data;
