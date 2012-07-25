@@ -10,9 +10,9 @@ import java.util.Queue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class CoordinateTable2D<V>{
+public class CoordinateTable2D<V> {
     
-    static final public int DIM = 12;
+    static final public int DIM = 10;
     
     int size;
     int dim;

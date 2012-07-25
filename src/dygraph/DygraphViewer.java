@@ -1,38 +1,42 @@
 package dygraph;
 
+import gui.graph.EdgePainter;
+import gui.graph.GraphController;
+import gui.graph.GraphData;
+import gui.graph.GraphData.IEdgeData;
+import gui.graph.GraphData.IVertexData;
+import gui.graph.GraphViewer;
+import gui.graph.VertexPainter;
+
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+
+import util.misc.ImageLibrary;
+
+import model.graph.Edge;
+import model.graph.Vertex;
 
 import com.restfb.types.Post;
 
 import dygraph.FacebookGraphData.FacebookEdgeData;
 import dygraph.FacebookGraphData.FacebookVertexData;
-import model.graph.Edge;
-import model.graph.Vertex;
-import gui.graph.EdgePainter;
-import gui.graph.GraphController;
-import gui.graph.GraphData;
-import gui.graph.GraphViewer;
-import gui.graph.VertexPainter;
-import gui.graph.GraphData.IEdgeData;
-import gui.graph.GraphData.IVertexData;
-import gui.graph.util.IDCounter;
 
 public class DygraphViewer extends GraphViewer {
 
 	Map<String,ProfileQueryEngine> profileSet;
+	DygraphController dController;
 	
 	public DygraphViewer(GraphController controller) {
 		super(controller);
 		profileSet = new HashMap<String,ProfileQueryEngine>();
+		dController = (DygraphController)controller;
 	}
 	
 	@Override
@@ -41,6 +45,17 @@ public class DygraphViewer extends GraphViewer {
 			addFacebookGraphData((FacebookGraphData)data);
 		} else {
 			super.addGraphData(data);
+		}
+	}
+	
+	@Override
+	public void paintFrame(Graphics g) {
+		super.paintFrame(g);
+		switch(dController.getMode()) {
+			case SEARCH:
+				g.drawImage(ImageLibrary.grabImage(
+						"http://dygraph.herobo.com/img/green_plus.png", true), curX+10, curY+10, this);
+				break;
 		}
 	}
 	
@@ -104,9 +119,9 @@ public class DygraphViewer extends GraphViewer {
         VERTEX_MENUITEMS[0].addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                FacebookVertexPainter fbVertex = ((FacebookVertexPainter)currentlySelected);
+                FacebookVertexPainter fbVertex = ((FacebookVertexPainter)getCurrentlySelected());
                 if (fbVertex == null) {
-                	fbVertex = ((FacebookVertexPainter)currentlyFocused);
+                	fbVertex = ((FacebookVertexPainter)getCurrentlyFocused());
                 }
                 ((DygraphController)controller).popURL("http://www.facebook.com/" + fbVertex.getID());
             }
@@ -114,9 +129,9 @@ public class DygraphViewer extends GraphViewer {
         VERTEX_MENUITEMS[1].addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                FacebookVertexPainter fbVertex = ((FacebookVertexPainter)currentlySelected);
+                FacebookVertexPainter fbVertex = ((FacebookVertexPainter)getCurrentlySelected());
                 if (fbVertex == null) {
-                	fbVertex = ((FacebookVertexPainter)currentlyFocused);
+                	fbVertex = ((FacebookVertexPainter)getCurrentlyFocused());
                 }
                 if (fbVertex != null) {
                 	expandProfileConnections(fbVertex.getID(),5);
@@ -126,7 +141,7 @@ public class DygraphViewer extends GraphViewer {
         EDGE_MENUITEMS[0].addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            	VertexPainter[] vertices = ((EdgePainter)currentlySelected).getConnectingVertices();
+            	VertexPainter[] vertices = ((EdgePainter)getCurrentlySelected()).getConnectingVertices();
             	FacebookVertexPainter v0 = (FacebookVertexPainter)vertices[0];
             	FacebookVertexPainter v1 = (FacebookVertexPainter)vertices[1];
             	((DygraphController)controller).popURL("http://www.facebook.com/" +
@@ -183,6 +198,7 @@ public class DygraphViewer extends GraphViewer {
 	}
 	
     private void addFacebookGraphData(FacebookGraphData data) {
+    	
     	for (FacebookVertexData vd : data.getVertexInfo()) {
     		String vid = vd.getID();
     		if (graph.findVertex(vid) == null) {
@@ -193,6 +209,7 @@ public class DygraphViewer extends GraphViewer {
     			this.addVertex(vid, randomPoints[0], randomPoints[1],vd.getName());
     		}
     	}
+    	
     	for (FacebookEdgeData ed : data.getEdgeInfo()) {
     		String eid = ed.getID();
     		String[] vid = ed.getVertexID();

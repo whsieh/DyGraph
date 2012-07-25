@@ -1,6 +1,9 @@
 
 package dygraph;
 
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.AccessController;
@@ -20,12 +23,26 @@ final public class DygraphApplet extends JApplet{
     
 	final static int DEFAULT_WIDTH = 1600;
 	final static int DEFAULT_HEIGHT = 900;
-	final static String DEBUG_TOKEN = "AAACEdEose0cBAE8HZCF6fbifbMwIsqJPLP0ixvfPPQZAMDgXHQK3d9hyCeiDhVzGIE9HQg3sRr8v4Q4cbl2NxlhfUfXGBhMponUO4x9DvC6bd0p8o0";
+	final static String DEBUG_TOKEN = "AAACEdEose0cBABIgPBoGcpZCy9DZA6mkUP0x9niZByMQQS3rDBtbHuQLiIpIOc7xr1HibTFzneJBjMzzVPKUOPL4e8UkAdX5LGY0NWocqF7vxI93keD";
 	DygraphController c;
 	
     @Override
     public void init() {
     	try {
+    		this.addComponentListener(new ComponentAdapter() {
+				@Override
+				public void componentResized(ComponentEvent arg0) {
+					if (c != null && c.getView() != null) {
+						c.getView().updateMidpoint();
+					}
+				}
+				@Override
+				public void componentMoved(ComponentEvent arg0) {
+					if (c != null && c.getView() != null) {
+						c.getView().updateMidpoint();
+					}
+				}
+			});
 	    	AccessController.doPrivileged(
 				new PrivilegedAction(){
 					public Object run() {
@@ -46,8 +63,7 @@ final public class DygraphApplet extends JApplet{
     }
     
     private void launchNewController() {
-    	final JApplet dygraph = this;
-		dygraph.setSize(1600,900);
+		setSize(1600,900);
     	String access_token = getParameter("access_token");
     	if (access_token != null) {
     		System.out.println("access_token: " + access_token);
@@ -57,7 +73,7 @@ final public class DygraphApplet extends JApplet{
     		ProfileQueryEngine.FB = new DefaultFacebookClient(DEBUG_TOKEN);
     	}
     	ProfileQueryEngine.fetchFriendData();
-        c = new DygraphController(dygraph,this);
+        c = new DygraphController(this);
         c.launch();
         DyGraphConsole.getInstance().display();
         DyGraphConsole.getInstance().setController(c);

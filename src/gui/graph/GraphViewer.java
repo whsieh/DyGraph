@@ -56,13 +56,18 @@ public class GraphViewer extends JPanel {
     protected Map<String,VertexPainter> vertexPainterMap;
     protected Map<String,EdgePainter> edgePainterMap;
     protected DLinkedList<VertexPainter> vertexList;
-    protected AbstractPainter currentlyFocused,currentlySelected,currentlyDragged;
+    private AbstractPainter currentlyFocused;
+	private AbstractPainter currentlySelected;
+	protected AbstractPainter currentlyDragged;
     protected DLinkedList<EdgePainter> edgeList;
     
     protected int curX;
     protected int curY;
     protected long prevArrowEvent;
     protected int arrowEventCount;
+    
+    protected int halfWidth;
+    protected int halfHeight;
     
     protected Rectangle bounds;
     protected Graph graph;
@@ -94,6 +99,11 @@ public class GraphViewer extends JPanel {
                 BorderFactory.createBevelBorder(BevelBorder.LOWERED)));
         popupX = 0;
         popupY = 0;
+        halfWidth = controller.root.getX() + controller.root.getWidth()/2;
+        halfHeight = controller.root.getY() + controller.root.getHeight()/2;
+        
+        curX = halfWidth;
+        curY = halfHeight;
         createContextMenu();
     }
     
@@ -127,13 +137,13 @@ public class GraphViewer extends JPanel {
         VERTEX_MENUITEMS[0].addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                removeVertex((VertexPainter)currentlySelected);
+                removeVertex((VertexPainter)getCurrentlySelected());
             }
         });
         EDGE_MENUITEMS[0].addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                removeEdge((EdgePainter)currentlySelected);
+                removeEdge((EdgePainter)getCurrentlySelected());
             }
         });
         VERTEX_MENUITEMS[1].addActionListener(new ActionListener() {
@@ -144,9 +154,20 @@ public class GraphViewer extends JPanel {
         });
     }
     
+    public void updateMidpoint() {
+        halfWidth = controller.root.getX() + controller.root.getWidth()/2;
+        halfHeight = controller.root.getY() + controller.root.getHeight()/2;
+    }
+    
     public void activate() {
         initiatePhysics();
         initiateAnimation();
+    }
+    
+    
+    public void setCurPosition(int x, int y) {
+    	curX = x;
+    	curY = y;
     }
     
     protected void displayPopup(MouseEvent me) {
@@ -187,11 +208,6 @@ public class GraphViewer extends JPanel {
         super.paintComponent(g);
         paintFrame(g);
     }
-
-    @Override
-    public void update(Graphics g) {
-        paint(g);
-    } 
     
     public void paintFrame(Graphics g) {
     	
@@ -202,11 +218,11 @@ public class GraphViewer extends JPanel {
             Graphics2D g2d = ((Graphics2D)g);
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                     RenderingHints.VALUE_ANTIALIAS_ON);
-            VertexPainter vp = ((VertexPainter)currentlySelected);
+            VertexPainter vp = ((VertexPainter)getCurrentlySelected());
             Color oldcolor = g.getColor();
             Stroke oldStroke = g2d.getStroke();
             g.setColor(Color.RED);
-            if (currentlyFocused != null && currentlyFocused instanceof VertexPainter) {
+            if (getCurrentlyFocused() != null && getCurrentlyFocused() instanceof VertexPainter) {
                 g2d.setStroke(new BasicStroke(3));
             }
             g.drawLine(vp.x,vp.y,curX,curY);
@@ -262,6 +278,12 @@ public class GraphViewer extends JPanel {
         int deltaY = e.getY() - curY;
         curX = e.getX();
         curY = e.getY();
+        for(VertexPainter vp : vertexList){
+            vp.moveTo(vp.x+deltaX,vp.y+deltaY);
+        }
+    }
+    
+    public void dragView(int deltaX, int deltaY){
         for(VertexPainter vp : vertexList){
             vp.moveTo(vp.x+deltaX,vp.y+deltaY);
         }
@@ -474,6 +496,22 @@ public class GraphViewer extends JPanel {
         panel.addEdge(center, vp5);
         panel.addEdge(center, vp6);
     }
+
+	public AbstractPainter getCurrentlySelected() {
+		return currentlySelected;
+	}
+
+	public void setCurrentlySelected(AbstractPainter currentlySelected) {
+		this.currentlySelected = currentlySelected;
+	}
+
+	public AbstractPainter getCurrentlyFocused() {
+		return currentlyFocused;
+	}
+
+	public void setCurrentlyFocused(AbstractPainter currentlyFocused) {
+		this.currentlyFocused = currentlyFocused;
+	}
 }
 
 class GraphPhysicsSimulator implements IPhysicsController {
@@ -515,6 +553,16 @@ class GraphPhysicsSimulator implements IPhysicsController {
             Vector2D.CARTESIAN,Vector2D.FORCE).scaleTo(g.controller.repulsiveConstant);
     }
     
+    private Vector2D autoDragForce() {
+    	int xDiff = g.curX - g.halfWidth;
+		int yDiff = g.curY - g.halfHeight;
+		if (xDiff*xDiff + yDiff*yDiff > 62500 ) {
+			return new Vector2D(xDiff/80,yDiff/80,Vector2D.CARTESIAN,Vector2D.FORCE);
+		} else {
+			return null;
+		}
+    }
+    
     @Override
     public long runPhysicsCycle() {
         long start = System.nanoTime();
@@ -532,6 +580,12 @@ class GraphPhysicsSimulator implements IPhysicsController {
                 if (m1 != m2) {
                     m1.acceleration.add(repulsiveForce(m1,m2).
                             scaleTo(-1/m1.mass()));
+                    if (g.hasFocus()) {
+	                    Vector2D dragForce = autoDragForce();
+	                    if (dragForce != null) {
+	                    	m1.acceleration.add(dragForce.scaleTo(-1/m1.mass()));
+	                    }
+                    }
                 }
             }
             m1.calc(DEFAULT_TIMESTEP_MS);
@@ -561,7 +615,7 @@ class Animator implements Runnable{
         while(true) {
             g.repaint();
             try {
-                Thread.sleep(15);
+                Thread.sleep(5);
             } catch (InterruptedException e) {
             }
             frames++;

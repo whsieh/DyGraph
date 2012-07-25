@@ -6,6 +6,7 @@ import gui.graph.util.Message;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -206,10 +207,14 @@ public class VertexPainter extends AbstractPainter implements IMassController,
 
 	@Override
 	public float mass() {
-		if (state == SELECTED || myEdges.isEmpty()) {
-			return 0;
+
+		int diffX = x - myParent.curX;
+		int diffY = y - myParent.curY;
+		if (diffX*diffX + diffY*diffY < 40000) {
+			return 4*myParent.controller.unitMass;
+		} else {
+			return myParent.controller.unitMass;
 		}
-		return myParent.controller.unitMass;
 	}
 
 	@Override
@@ -246,13 +251,13 @@ public class VertexPainter extends AbstractPainter implements IMassController,
 
 	@Override
 	public void calc(float dt) {
-		if (state != FOCUSED) {
+		
+		if (myParent.currentlyDragged != this) {
 			moveTo(position);
+			position.setZero();
+			position.add(velocity.scaleTo(dt));
+			velocity.add(acceleration.scaleTo(dt));
 		}
-		// System.out.println("    Move by: " + position);
-		position.setZero();
-		position.add(velocity.scaleTo(dt));
-		velocity.add(acceleration.scaleTo(dt));
 		if (!velocity.isValid()) {
 			velocity.setZero();
 		}

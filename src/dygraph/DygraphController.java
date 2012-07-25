@@ -1,9 +1,17 @@
 package dygraph;
 
+import gui.graph.AbstractPainter;
+import gui.graph.EdgePainter;
 import gui.graph.GraphController;
 import gui.graph.GraphViewer;
+import gui.graph.VertexPainter;
+import gui.graph.util.Data;
+import gui.graph.util.IDCounter;
+import gui.graph.util.Message;
 
+import java.awt.Component;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -16,11 +24,29 @@ import stat.comm.CommunityTransformer;
 
 public class DygraphController extends GraphController<DygraphViewer> {
     
-	private DygraphApplet applet;
-    
-    public DygraphController(JApplet root, DygraphApplet applet) {
+	DygraphViewer dView;
+	DygraphApplet dRoot;
+	Mode mode;
+	
+	boolean isAutoScrolling;
+	
+	public static enum Mode {
+		DEFAULT,
+		SEARCH,
+		BROWSE,
+		MENU
+	}
+	
+    public DygraphController(DygraphApplet root) {
         super(root);
-        this.applet = applet;
+        dRoot = (DygraphApplet)root;
+        dView = (DygraphViewer)view;
+        mode = Mode.DEFAULT;
+        isAutoScrolling = true;
+    }
+    
+    Mode getMode() {
+    	return mode;
     }
     
     @Override
@@ -37,14 +63,27 @@ public class DygraphController extends GraphController<DygraphViewer> {
     }
     
     @Override
+    public void handleKeyReleased(KeyEvent e) {
+    	if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
+    		mode = Mode.DEFAULT;
+    	}
+    }
+    
+    @Override
     public void handleKeyPressed(KeyEvent e) {
-        super.handleKeyPressed(e);
-        view.dragView(e);
+    	if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
+    		if (mode != Mode.MENU) {
+    			mode = Mode.SEARCH;
+    		}
+    	} else {
+	        super.handleKeyPressed(e);
+	        view.dragView(e);
+    	}
     }
     
     public void popURL(String url) {
     	try {
-			applet.popURL(new URL(url));
+			((DygraphApplet)root).popURL(new URL(url));
 		} catch (MalformedURLException e) {
 			DyGraphConsole.tryErr("Failed to popup new URL (" + url + ")");
 		}

@@ -202,13 +202,13 @@ class InfoDisplay extends JInternalFrame {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_DELETE || e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
-                    if (view.currentlySelected != null) {
-                        if (view.currentlySelected instanceof EdgePainter) {
-                            view.removeEdge((EdgePainter)view.currentlySelected);
-                        } else if (view.currentlySelected instanceof VertexPainter) {
-                            view.removeVertex((VertexPainter)view.currentlySelected);
+                    if (view.getCurrentlySelected() != null) {
+                        if (view.getCurrentlySelected() instanceof EdgePainter) {
+                            view.removeEdge((EdgePainter)view.getCurrentlySelected());
+                        } else if (view.getCurrentlySelected() instanceof VertexPainter) {
+                            view.removeVertex((VertexPainter)view.getCurrentlySelected());
                         }
-                        view.currentlySelected = null;
+                        view.setCurrentlySelected(null);
                     }
                 }
             }

@@ -48,6 +48,9 @@ public class ImageLibrary {
             	} else {
             		i = ImageIO.read(new File(imageName));
             	}
+                if (transparent) {
+                    i = transformToTransparency((BufferedImage)i);
+                }
                 images.put(imageName, i);
             } catch (IOException e) {
                 System.err.println("ERROR: image resource not found."
@@ -56,10 +59,6 @@ public class ImageLibrary {
             }
         } else {
             i = images.get(imageName);
-        }
-        
-        if (transparent) {
-            i = transformToTransparency((BufferedImage)i);
         }
         return i;
     }

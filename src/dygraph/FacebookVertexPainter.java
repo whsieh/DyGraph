@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -67,10 +68,6 @@ public class FacebookVertexPainter extends VertexPainter{
         STATE_COLORS[AbstractPainter.FOCUSED][1]);
     }
     
-    protected String getID() {
-    	return id;
-    }
-    
     @Override
     protected void paintSelected(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
@@ -113,8 +110,8 @@ public class FacebookVertexPainter extends VertexPainter{
         if (isLoading) {
         	g2d.drawImage(ImageLibrary.grabImage("http://dygraph.herobo.com/img/green_plus.png", true), x+halfWidth, y-halfHeight-25, myParent);
         }
-        
-        g2d.drawString(displayName, x - halfWidth, y + halfHeight + 15);
+        g2d.setFont(new Font("Arial", 1, 16));
+        g2d.drawString(displayName, x - halfWidth - 15, y + halfHeight + 15);
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
         RenderingHints.VALUE_ANTIALIAS_OFF);
         g2d.setStroke(s);

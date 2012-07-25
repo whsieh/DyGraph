@@ -19,7 +19,7 @@ import model.graph.Graph;
 
 public abstract class GraphController<T extends GraphViewer> {
     
-    protected static final float DEFAULT_REPULSIVE_CONST = (float)Math.pow(2,12);
+    protected static final float DEFAULT_REPULSIVE_CONST = 8192f;
     protected static final float DEFAULT_EQUILIBRIUM_LENGTH = 100;
     protected static final float DEFAULT_UNIT_MASS = 15000;
     
@@ -109,7 +109,7 @@ public abstract class GraphController<T extends GraphViewer> {
             }
             @Override
             public void mousePressed(MouseEvent e) {
-                handleMouseClicked(e);
+                handleMousePressed(e);
             }
         });
     }
@@ -123,25 +123,15 @@ public abstract class GraphController<T extends GraphViewer> {
     }
     private void addKeyboardAction() {
         view.addKeyListener(new KeyAdapter() {
-            
+            @Override
+            public void keyReleased(KeyEvent e) {
+            	handleKeyReleased(e);
+            }
             @Override
             public void keyPressed(KeyEvent e) {
                 handleKeyPressed(e);
             }
         });
-    }
-    
-    public void handleKeyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_DELETE || e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
-            if (view.currentlySelected != null) {
-                if (view.currentlySelected instanceof EdgePainter) {
-                    view.removeEdge((EdgePainter)view.currentlySelected);
-                } else if (view.currentlySelected instanceof VertexPainter) {
-                    view.removeVertex((VertexPainter)view.currentlySelected);
-                }
-                view.currentlySelected = null;
-            }
-        }
     }
     
     public <T> T getData(String id, String key) {
@@ -165,6 +155,24 @@ public abstract class GraphController<T extends GraphViewer> {
     	}
     }
     
+    
+    public void handleKeyPressed(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_DELETE || e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+            if (view.getCurrentlySelected() != null) {
+                if (view.getCurrentlySelected() instanceof EdgePainter) {
+                    view.removeEdge((EdgePainter)view.getCurrentlySelected());
+                } else if (view.getCurrentlySelected() instanceof VertexPainter) {
+                    view.removeVertex((VertexPainter)view.getCurrentlySelected());
+                }
+                view.setCurrentlySelected(null);
+            }
+        }
+    }
+    
+    public void handleKeyReleased(KeyEvent e) {
+
+    }
+    
     public void handleMouseWheelMoved(MouseWheelEvent e) {
         if (e.isControlDown()) {
             repulsiveConstant -= e.getWheelRotation()*20;
@@ -174,35 +182,38 @@ public abstract class GraphController<T extends GraphViewer> {
             equilibriumLength -= e.getWheelRotation()*10;
         }
     }
+    
     public void handleMouseReleased(MouseEvent e) {
         if (view.currentlyDragged != null) {
             view.currentlyDragged = null;
         }
-        if ( view.currentlyFocused != null) {
-            view.currentlyFocused.inform(Message.MOUSE_EXITED, new Data(e));
-            view.currentlyFocused = null;
+        if ( view.getCurrentlyFocused() != null) {
+            view.getCurrentlyFocused().inform(Message.MOUSE_EXITED, new Data(e));
+            view.setCurrentlyFocused(null);
         }
-        if (view.currentlySelected != null) {
-        	if (!(e.getX() == view.curX && e.getY() == view.curY)) {
-	        	view.currentlySelected.inform(Message.MOUSE_DESELECTED, new Data(e));
-	        	view.currentlySelected = null;
+        if (view.getCurrentlySelected() != null) {
+        	if (!((view.curX - 10 < e.getX() && e.getX() < view.curX + 10) &&
+        			(view.curY - 10 < e.getY() && e.getY() < view.curY + 10))) {
+	        	view.getCurrentlySelected().inform(Message.MOUSE_DESELECTED, new Data(e));
+	        	view.setCurrentlySelected(null);
         	}
         }
     }
-    public void handleMouseClicked(MouseEvent e) {    
+    
+    public void handleMousePressed(MouseEvent e) {   
         view.requestFocus();
         VertexPainter node = view.locateVertexPainter(e.getX(),e.getY());
         EdgePainter edge = view.locateEdgePainter(e.getX(),e.getY());
         if (node != null) {
             if (view.currentlyAddingEdge) {
-                if (view.currentlyFocused != null) {
-                    view.addEdge((VertexPainter)view.currentlyFocused,
-                            (VertexPainter)view.currentlySelected);
+                if (view.getCurrentlyFocused() != null) {
+                    view.addEdge((VertexPainter)view.getCurrentlyFocused(),
+                            (VertexPainter)view.getCurrentlySelected());
                     if (e.isShiftDown()) {
-                        view.currentlySelected.inform(Message.MOUSE_DESELECTED,new Data(e));
-                        view.currentlySelected = view.currentlyFocused;
-                        view.currentlyFocused = null;
-                        view.currentlySelected.inform(Message.MOUSE_CLICKED, null);
+                        view.getCurrentlySelected().inform(Message.MOUSE_DESELECTED,new Data(e));
+                        view.setCurrentlySelected(view.getCurrentlyFocused());
+                        view.setCurrentlyFocused(null);
+                        view.getCurrentlySelected().inform(Message.MOUSE_CLICKED, null);
                     } else {
                         view.currentlyAddingEdge = false;
                     }
@@ -210,30 +221,30 @@ public abstract class GraphController<T extends GraphViewer> {
                     view.currentlyAddingEdge = false;
                 }
             } else {
-                if ( view.currentlySelected != null ) {
-                    view.currentlySelected.inform(Message.MOUSE_DESELECTED,new Data(e));
+                if ( view.getCurrentlySelected() != null ) {
+                    view.getCurrentlySelected().inform(Message.MOUSE_DESELECTED,new Data(e));
                 }
-                view.currentlySelected = node;
+                view.setCurrentlySelected(node);
                 node.inform(Message.MOUSE_CLICKED,new Data(e));
                 if (e.isShiftDown()  && newEdgeEnabled()) {
                     view.currentlyAddingEdge = true;
                 }
             }
         }  else if (edge != null) {
-            if ( view.currentlySelected != null ) {
-                view.currentlySelected.inform(Message.MOUSE_DESELECTED,null);
+            if ( view.getCurrentlySelected() != null ) {
+                view.getCurrentlySelected().inform(Message.MOUSE_DESELECTED,null);
             }
             if(view.currentlyAddingEdge) {
                 view.currentlyAddingEdge = false;
             }
-            view.currentlySelected = edge;
+            view.setCurrentlySelected(edge);
             edge.inform(Message.MOUSE_CLICKED,null);
         } else {
             if(view.currentlyAddingEdge) {
                 view.currentlyAddingEdge = false;
             }
-            if ( view.currentlySelected != null ) {
-                view.currentlySelected.inform(Message.MOUSE_DESELECTED,new Data(e));
+            if ( view.getCurrentlySelected() != null ) {
+                view.getCurrentlySelected().inform(Message.MOUSE_DESELECTED,new Data(e));
             }
             if (e.isShiftDown() && e.getButton() == MouseEvent.BUTTON1) {
                 view.addVertex("#"+IDCounter.next(),e.getX(),e.getY());
@@ -245,10 +256,12 @@ public abstract class GraphController<T extends GraphViewer> {
     }
     public void handleMouseDragged(MouseEvent e) {
         view.requestFocus();
+        int x = e.getX(),y = e.getY();
+        view.setCurPosition(x, y);
         if (e.isShiftDown()) {
             /* TODO : IMPLEMENT MULTIPLE SELECTION */        
         } else {
-            VertexPainter node = view.locateVertexPainter(e.getX(),e.getY());
+            VertexPainter node = view.locateVertexPainter(x,y);
             if (view.currentlyDragged != null) {
               view.currentlyDragged.inform(Message.MOUSE_DRAGGED, new Data(e));
             } else if (node != null) {
@@ -265,21 +278,21 @@ public abstract class GraphController<T extends GraphViewer> {
         VertexPainter node = view.locateVertexPainter(e.getX(),e.getY());
         EdgePainter edge = view.locateEdgePainter(e.getX(),e.getY());
         if (node != null) {
-            if (view.currentlyFocused != null) {
-                view.currentlyFocused.inform(Message.MOUSE_EXITED,new Data(e));
+            if (view.getCurrentlyFocused() != null) {
+                view.getCurrentlyFocused().inform(Message.MOUSE_EXITED,new Data(e));
             }
-            view.currentlyFocused = node;
+            view.setCurrentlyFocused(node);
             node.inform(Message.MOUSE_OVER,new Data(e));
         } else if (edge != null) {
-            if (view.currentlyFocused != null) {
-                view.currentlyFocused.inform(Message.MOUSE_EXITED,new Data(e));
+            if (view.getCurrentlyFocused() != null) {
+                view.getCurrentlyFocused().inform(Message.MOUSE_EXITED,new Data(e));
             }
-            view.currentlyFocused = edge;
+            view.setCurrentlyFocused(edge);
             edge.inform(Message.MOUSE_OVER, null);
         } else {
-            if (view.currentlyFocused != null) {
-                view.currentlyFocused.inform(Message.MOUSE_EXITED,new Data(e));
-                view.currentlyFocused = null;
+            if (view.getCurrentlyFocused() != null) {
+                view.getCurrentlyFocused().inform(Message.MOUSE_EXITED,new Data(e));
+                view.setCurrentlyFocused(null);
             }
         }
         view.curX = e.getX();

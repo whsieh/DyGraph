@@ -2,7 +2,7 @@ package util.misc;
 
 public class LinearEqn2D {
     
-    final static float DEFAULT_MARGIN = 8.0f;
+    final static float DEFAULT_MARGIN = 10f;
     
     float m;
     float b;
@@ -20,7 +20,7 @@ public class LinearEqn2D {
         this.b = b;
         this.x = new float[] {(float)Double.NEGATIVE_INFINITY,(float)Double.POSITIVE_INFINITY};
         this.y = new float[] {(float)Double.NEGATIVE_INFINITY,(float)Double.POSITIVE_INFINITY};
-        this.margin = 10f;
+        this.margin = DEFAULT_MARGIN;
     }
     
     public LinearEqn2D(float[] xBounds, float[] yBounds){
@@ -38,7 +38,7 @@ public class LinearEqn2D {
         this.b = y0 - this.m * x0;
         this.x = new float[] {x0, x1};
         this.y = new float[] {y0, y1};
-        this.margin = 5.0f;
+        this.margin = DEFAULT_MARGIN;
     }
     
     public float calcY(float x, boolean checkBounds){
@@ -77,12 +77,12 @@ public class LinearEqn2D {
     }
 
     public boolean contains(float x,float y){
-        if (m < 0.05 && m > -0.05) {
+        if (m < 0.1 && m > -0.1) {
             if ((this.x[0] <= x && x <= this.x[1]) || (this.x[0] >= x && x >= this.x[1])) {
                 float _y_ = y - ((this.y[0] + this.y[1]) / 2);
                 return -margin < _y_ && _y_ < margin;
             }
-        } else if (m > 15 || m < -15){
+        } else if (m > 10 || m < -10){
             if ((this.y[0] <= y && y <= this.y[1]) || (this.y[0] >= y && y >= this.y[1])) {
                 float _x_ = x - ((this.x[0] + this.x[1]) / 2);
                 return -margin < _x_ && _x_ < margin;

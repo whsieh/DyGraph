@@ -79,7 +79,7 @@ public class EdgePainter extends AbstractPainter implements ISpringController,IM
     }
     
     @Override
-    void inform(Message message, Data e) {
+	public void inform(Message message, Data e) {
         switch(message){
             
             case MOUSE_OVER:

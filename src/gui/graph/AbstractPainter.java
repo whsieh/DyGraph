@@ -39,7 +39,11 @@ public abstract class AbstractPainter {
     	}
     }
     
-    abstract void inform(Message message, Data e);
+    public String getID() {
+    	return id;
+    }
+    
+    public abstract void inform(Message message, Data e);
 
     protected void setState(int state){ 
         this.state = state;
