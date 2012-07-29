@@ -10,6 +10,9 @@ import gui.graph.VertexPainter;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
@@ -18,10 +21,9 @@ import java.util.Map;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import util.misc.ImageLibrary;
-
 import model.graph.Edge;
 import model.graph.Vertex;
+import util.misc.ImageLibrary;
 
 import com.restfb.types.Post;
 
@@ -50,13 +52,16 @@ public class DygraphViewer extends GraphViewer {
 	
 	@Override
 	public void paintFrame(Graphics g) {
-		super.paintFrame(g);
+		Graphics2D g2d = (Graphics2D)g;
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+		super.paintFrame(g2d);
 		switch(dController.getMode()) {
 			case SEARCH:
-				g.drawImage(ImageLibrary.grabImage(
+				g2d.drawImage(ImageLibrary.grabImage(
 						"http://dygraph.herobo.com/img/green_plus.png", true), curX+10, curY+10, this);
 				break;
 		}
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_OFF);
 	}
 	
 	public String whois(String id) {
@@ -84,8 +89,8 @@ public class DygraphViewer extends GraphViewer {
         EDGE_POPUPMENU = new JPopupMenu();
         
         WHITESPACE_MENUITEMS = new JMenuItem[] {new JMenuItem("Prune connections")};
-        VERTEX_MENUITEMS = new JMenuItem[] {new JMenuItem("Visit profile"),
-        		new JMenuItem("Expand connections")};
+        VERTEX_MENUITEMS = new JMenuItem[] {
+        		new JMenuItem("Expand connections"),new JMenuItem("Visit profile")};
         EDGE_MENUITEMS = new JMenuItem[] {new JMenuItem("See friendship")};
         
         for(int i = 0; i < VERTEX_MENUITEMS.length; i++) {
@@ -102,31 +107,10 @@ public class DygraphViewer extends GraphViewer {
         WHITESPACE_MENUITEMS[0].addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-        		int deltaCount = 0;
-        		do {
-        			deltaCount = 0;
-        			for (String id : graph.vertices()) {
-        				Vertex v = graph.findVertex(id);
-        				if (v.degree() <= 1.0) {
-        					deltaCount++;
-        					removeVertex(id);
-        				}
-        			}
-        		} while(deltaCount > 0);
+            	pruneConnections();
             }
         });
-        
         VERTEX_MENUITEMS[0].addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                FacebookVertexPainter fbVertex = ((FacebookVertexPainter)getCurrentlySelected());
-                if (fbVertex == null) {
-                	fbVertex = ((FacebookVertexPainter)getCurrentlyFocused());
-                }
-                ((DygraphController)controller).popURL("http://www.facebook.com/" + fbVertex.getID());
-            }
-        });
-        VERTEX_MENUITEMS[1].addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 FacebookVertexPainter fbVertex = ((FacebookVertexPainter)getCurrentlySelected());
@@ -136,6 +120,16 @@ public class DygraphViewer extends GraphViewer {
                 if (fbVertex != null) {
                 	expandProfileConnections(fbVertex.getID(),5);
                 }
+            }
+        });
+        VERTEX_MENUITEMS[1].addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                FacebookVertexPainter fbVertex = ((FacebookVertexPainter)getCurrentlySelected());
+                if (fbVertex == null) {
+                	fbVertex = ((FacebookVertexPainter)getCurrentlyFocused());
+                }
+                ((DygraphController)controller).popURL("http://www.facebook.com/" + fbVertex.getID());
             }
         });
         EDGE_MENUITEMS[0].addActionListener(new ActionListener() {
@@ -150,6 +144,29 @@ public class DygraphViewer extends GraphViewer {
         });
 	}
 	
+	@Override
+	public FacebookVertexPainter locateVertexPainter(int x, int y) {
+		return (FacebookVertexPainter)vertexTable.find(new Point(x,y));
+	}
+	
+	protected void pruneConnections() {
+		synchronized(this) {
+			int deltaCount;
+			do {
+				deltaCount = 0;
+				for (String id : graph.vertices()) {
+					Vertex v = graph.findVertex(id);
+					FacebookVertexPainter fvp = (FacebookVertexPainter)vertexPainterMap.get(id);
+					if (v.weight() <= 1.0 && !id.equals(ProfileQueryEngine.CURRENT_USER.key())
+							&& fvp != null && !fvp.isLoading) {
+						deltaCount++;
+						removeVertex(id);
+					}
+				}
+			} while(deltaCount > 0);
+		}
+	}
+	
 	protected FacebookVertexPainter getFacebookProfilePainter(String id) {
 		return (FacebookVertexPainter)vertexPainterMap.get(id);
 	}
@@ -160,38 +177,28 @@ public class DygraphViewer extends GraphViewer {
 	}
 	
 	public void expandProfileConnections(final String id) {
-		new Thread(new Runnable(){
-			@Override
-			public void run() {
-				ProfileQueryEngine engine = getProfile(id);
-				if (engine != null) {
-					FacebookVertexPainter fbvp = (FacebookVertexPainter)vertexPainterMap.get(id);
-					fbvp.setLoading(true);
-					for (Post post : engine.fetchNextPosts()) {
-						FacebookGraphData data = FacebookUtil.toGraphData(post);
-						addFacebookGraphData(data);
-					}
-					fbvp.setLoading(false);
-				}
-			}
-		}).start();
+		expandProfileConnections(id, 1);
 	}
 	
 	public void expandProfileConnections(final String id, final int count) {
 		new Thread(new Runnable(){
 			@Override
 			public void run() {
-				ProfileQueryEngine engine = getProfile(id);
-				if (engine != null) {
-					FacebookVertexPainter fbvp = (FacebookVertexPainter)vertexPainterMap.get(id);
-					for (int i = 0; i < count; i++) {
-						fbvp.setLoading(true);
-						for (Post post : engine.fetchNextPosts()) {
-							FacebookGraphData data = FacebookUtil.toGraphData(post);
-							addFacebookGraphData(data);
+				FacebookVertexPainter fbvp = (FacebookVertexPainter)vertexPainterMap.get(id);
+				if (fbvp != null && !fbvp.isLoading) {
+					fbvp.setLoading(true);
+					ProfileQueryEngine engine = getProfile(id);
+					if (engine != null) {
+						for (int i = 0; i < count; i++) {
+							fbvp.setLoading(true);
+							for (Post post : engine.fetchNextPosts()) {
+								FacebookGraphData data = FacebookUtil.toGraphData(post);
+								addFacebookGraphData(data);
+							}
+							fbvp.setLoading(false);
 						}
-						fbvp.setLoading(false);
 					}
+					fbvp.setLoading(false);
 				}
 			}
 		}).start();
@@ -203,8 +210,8 @@ public class DygraphViewer extends GraphViewer {
     		String vid = vd.getID();
     		if (graph.findVertex(vid) == null) {
     			int[] randomPoints = GraphViewer.getRandomPoints();
-    			if (DyGraphConsole.exists()) {
-    				DyGraphConsole.getInstance().log("Adding user " + vid + " (" + vd.getName() + ")");
+    			if (DygraphConsole.exists()) {
+    				DygraphConsole.getInstance().log("Adding user " + vid + " (" + vd.getName() + ")");
     			}
     			this.addVertex(vid, randomPoints[0], randomPoints[1],vd.getName());
     		}

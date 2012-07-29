@@ -1,5 +1,8 @@
 package dygraph;
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -82,9 +85,10 @@ public class ProfileQueryEngine {
 	}
 	
 	public List<Post> fetchNextPosts() {
-		if (myFeed.hasNext()) {
+		try {
 			List<Post> myWall = myFeed.next();
 			return myWall;
+		} catch (NullPointerException e) {
 		}
 		return null;
 	}
@@ -94,7 +98,17 @@ public class ProfileQueryEngine {
 		try {
 			URL imgURL = new URL("https://graph.facebook.com/" + profileID + "/picture");
 			try {
-				return ImageIO.read(imgURL);
+				if (profileID.equals(CURRENT_USER.key())) {
+					Image img = ImageIO.read(imgURL);
+					img = img.getScaledInstance((int)(1.5*img.getWidth(null)), (int)(1.5*img.getHeight(null)),Image.SCALE_SMOOTH);
+			        BufferedImage imageBuff = new BufferedImage(img.getWidth(null),img.getHeight(null), BufferedImage.TYPE_INT_RGB);
+			        Graphics g = imageBuff.createGraphics();
+			        g.drawImage(img, 0, 0, new Color(0,0,0), null);
+			        g.dispose();
+			        return imageBuff;
+				} else {
+					return ImageIO.read(imgURL);
+				}
 			} catch (IOException e) {
 				return null;
 			}

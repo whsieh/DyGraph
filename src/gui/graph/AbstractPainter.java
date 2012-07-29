@@ -16,22 +16,30 @@ import java.awt.image.RGBImageFilter;
 public abstract class AbstractPainter {
     
     protected static final int DEFAULT = 0;
-    protected static final int FOCUSED = 1;
-    protected static final int SELECTED = 2;
+    protected static final int HIGHLIGHTED = 1;
+    protected static final int FOCUSED = 2;
+    protected static final int ACCENTUATED = 3;
+    protected static final int SELECTED = 4;
     
     protected int state;
     protected GraphViewer myParent;
     protected String id;
     
-    abstract boolean contains(int x, int y);
+    protected abstract boolean contains(int x, int y);
     
     protected void paint(Graphics g) {
     	switch(state) {
 	    	case DEFAULT:
 	    		paintDefault(g);
 	    		break;
+	    	case HIGHLIGHTED:
+	    		paintHighlighted(g);
+	    		break;
 	    	case FOCUSED:
 	    		paintFocused(g);
+	    		break;
+	    	case ACCENTUATED:
+	    		paintAccentuated(g);
 	    		break;
 	    	case SELECTED:
 	    		paintSelected(g);
@@ -49,9 +57,13 @@ public abstract class AbstractPainter {
         this.state = state;
     }
     
+    protected abstract void paintHighlighted(Graphics g);
+    
     protected abstract void paintDefault(Graphics g);
     
     protected abstract void paintFocused(Graphics g);
+    
+    protected abstract void paintAccentuated(Graphics g);
     
     protected abstract void paintSelected(Graphics g);
     

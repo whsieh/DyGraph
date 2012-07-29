@@ -1,9 +1,7 @@
 package stat.comm;
 
-import gui.graph.AbstractPainter;
-
-import java.awt.Graphics;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import stat.IStatResult;
@@ -48,7 +46,6 @@ public class Dendrogram implements IStatResult{
 	
 	protected Dendrogram first;
 	protected Dendrogram second;
-	
 	
 	protected Dendrogram() {
 		names = new HashSet<String>();
@@ -146,6 +143,29 @@ public class Dendrogram implements IStatResult{
 		return sb.toString();
 	}
 
+	public String toString(Map<String,String> idMap) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("(" + size() + " members): [");
+		for (String name : names) {
+			sb.append(idMap.get(name) + " ; ");
+		}
+		sb.append("]");
+		if (!isLeaf()) {
+			sb.append("\n");
+			for (int i = 0; i < depth+1; i++) {
+				sb.append("    ");
+			}
+			sb.append("First: " + first.toString(idMap));
+			sb.append("\n");
+			for (int i = 0; i < depth+1; i++) {
+				sb.append("    ");
+			}
+			sb.append("Second: " + second.toString(idMap));
+		}
+		return sb.toString();
+	}
+
+	
 	@Override
 	public int getType() {
 		return IStatResult.ABSTRACT;

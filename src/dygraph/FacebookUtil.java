@@ -33,10 +33,15 @@ final public class FacebookUtil {
 				/* 'to': the recipients of this Facebook post */
 				List<NamedFacebookType> to = post.getTo();
 				/* For each recipient of the Facebook post... */
+				boolean output = false;
 				for (NamedFacebookType user : to) {
 					if (!mentioned.contains(user.getId()) &&
 							(user.getId().equals(ProfileQueryEngine.CURRENT_USER.key()) || ProfileQueryEngine.MY_FRIENDS.containsKey(user.getId()))) {
 						mentioned.add(user.getId());
+						if (!output) {
+							DygraphConsole.tryLog("Parsing message: " + msg);
+							output = true;
+						}
 						data.addVertexData(user.getId(),user.getName());
 						data.addEdgeData(from.getId(),user.getId(),post.getMessage(),FacebookGraphData.POST_WEIGHT);
 					}

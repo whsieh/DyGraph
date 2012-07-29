@@ -3,22 +3,37 @@ package gui.graph;
 
 import gui.graph.GraphData.IEdgeData;
 import gui.graph.GraphData.IVertexData;
-import gui.graph.util.IDCounter;
 import gui.graph.physics.IPhysicsController;
+import gui.graph.util.IDCounter;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Stroke;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import model.graph.Graph;
-import util.list.DLinkedList;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
+
+import javax.swing.BorderFactory;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.border.BevelBorder;
+
 import model.graph.Edge;
-import model.graph.exception.GraphException;
+import model.graph.Graph;
 import util.dict.CoordinateTable2D;
+import util.list.DLinkedList;
 import util.misc.Vector2D;
 
 /* View-model invariant (please note). Each AbstractPainter in this graph should have an id field that
@@ -33,8 +48,8 @@ public class GraphViewer extends JPanel {
     
     protected static final boolean RUN_PHYSICS = true;
     
-    protected static final int DEFAULT_WIDTH = (int)(Toolkit.getDefaultToolkit().getScreenSize().width * 0.75);
-    protected static final int DEFAULT_HEIGHT = (int)(Toolkit.getDefaultToolkit().getScreenSize().height * 0.75);
+    protected static final int DEFAULT_WIDTH = (int)(Toolkit.getDefaultToolkit().getScreenSize().width);
+    protected static final int DEFAULT_HEIGHT = (int)(Toolkit.getDefaultToolkit().getScreenSize().height);
     protected static final int SCREEN_SIZE_MULT = 4;
     
     protected int popupX,popupY;
@@ -49,8 +64,10 @@ public class GraphViewer extends JPanel {
     protected static float repulsive_constant = (float)Math.pow(2,12);
     protected static float equilibrium_length = 0;
     protected static int unit_mass = 512;
+    protected static int heavy_mass = 3000;
     
     protected boolean currentlyAddingEdge;
+    protected boolean draggingView;
     
     protected CoordinateTable2D<VertexPainter> vertexTable;
     protected Map<String,VertexPainter> vertexPainterMap;
@@ -216,8 +233,6 @@ public class GraphViewer extends JPanel {
         }
         if (currentlyAddingEdge) {
             Graphics2D g2d = ((Graphics2D)g);
-            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                    RenderingHints.VALUE_ANTIALIAS_ON);
             VertexPainter vp = ((VertexPainter)getCurrentlySelected());
             Color oldcolor = g.getColor();
             Stroke oldStroke = g2d.getStroke();
@@ -276,10 +291,8 @@ public class GraphViewer extends JPanel {
     public void dragView(MouseEvent e){
         int deltaX = e.getX() - curX;
         int deltaY = e.getY() - curY;
-        curX = e.getX();
-        curY = e.getY();
         for(VertexPainter vp : vertexList){
-            vp.moveTo(vp.x+deltaX,vp.y+deltaY);
+        	vp.moveTo(vp.x+deltaX,vp.y+deltaY);
         }
     }
     
@@ -516,7 +529,7 @@ public class GraphViewer extends JPanel {
 
 class GraphPhysicsSimulator implements IPhysicsController {
     
-    static final int CYCLES_PER_SECOND = 60;
+    static final int CYCLES_PER_SECOND = 100;
     static final int DEFAULT_FRAME_TIME_MS = 1000/CYCLES_PER_SECOND;
     
     GraphViewer g;
@@ -528,7 +541,8 @@ class GraphPhysicsSimulator implements IPhysicsController {
     @Override
     public void run() {
         while(true) {
-            int ELAPSED_MS = (int)runPhysicsCycle()/1000000;
+            int ELAPSED_MS = (int)(runPhysicsCycle()/1000000.0);
+            // System.out.println("Physics: " + ELAPSED_MS + " ms");
             if (ELAPSED_MS < DEFAULT_FRAME_TIME_MS) {
                 try{
                     Thread.sleep(DEFAULT_FRAME_TIME_MS - ELAPSED_MS);
@@ -557,7 +571,7 @@ class GraphPhysicsSimulator implements IPhysicsController {
     	int xDiff = g.curX - g.halfWidth;
 		int yDiff = g.curY - g.halfHeight;
 		if (xDiff*xDiff + yDiff*yDiff > 62500 ) {
-			return new Vector2D(xDiff/80,yDiff/80,Vector2D.CARTESIAN,Vector2D.FORCE);
+			return new Vector2D(xDiff>>7,yDiff>>7,Vector2D.CARTESIAN,Vector2D.FORCE);
 		} else {
 			return null;
 		}
@@ -580,7 +594,7 @@ class GraphPhysicsSimulator implements IPhysicsController {
                 if (m1 != m2) {
                     m1.acceleration.add(repulsiveForce(m1,m2).
                             scaleTo(-1/m1.mass()));
-                    if (g.hasFocus()) {
+                    if (g.hasFocus() && !g.draggingView) {
 	                    Vector2D dragForce = autoDragForce();
 	                    if (dragForce != null) {
 	                    	m1.acceleration.add(dragForce.scaleTo(-1/m1.mass()));
@@ -610,15 +624,14 @@ class Animator implements Runnable{
     @Override
     public void run() {
         Graphics2D g2d = (Graphics2D)g.getGraphics();
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
-        int frames = 0;
         while(true) {
+        	long start = System.nanoTime();
             g.repaint();
             try {
                 Thread.sleep(5);
             } catch (InterruptedException e) {
             }
-            frames++;
+            // System.out.println("Animation: " + (System.nanoTime() - start)/1000000.0);
         }
     }
 }

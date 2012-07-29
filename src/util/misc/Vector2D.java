@@ -38,6 +38,14 @@ public class Vector2D {
         this.type = type;
     }
     
+    public void setX(float x) {
+    	this.x = x;
+    }
+    
+    public void setY(float y) {
+    	this.y = y;
+    }
+    
     public float x() {
         return x;
     }
@@ -136,5 +144,10 @@ public class Vector2D {
     public String toString() {
         return type + "<" + x + "," + y + ">";
     }
+
+	public void add(float i, float j) {
+		x += i;
+		y += j;
+	}
     
 }

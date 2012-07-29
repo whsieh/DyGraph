@@ -23,7 +23,7 @@ final public class DygraphApplet extends JApplet{
     
 	final static int DEFAULT_WIDTH = 1600;
 	final static int DEFAULT_HEIGHT = 900;
-	final static String DEBUG_TOKEN = "AAACEdEose0cBABIgPBoGcpZCy9DZA6mkUP0x9niZByMQQS3rDBtbHuQLiIpIOc7xr1HibTFzneJBjMzzVPKUOPL4e8UkAdX5LGY0NWocqF7vxI93keD";
+	final static String DEBUG_TOKEN = "AAACEdEose0cBAOUmg6clOfCNWNwJMo9VmTg1INsdnpglcXiq9ZCUgZBqkiNhfHKmza7ZAcWseWKWdifhTqdpFTsUr55H4Spkrb9sMAfcRmH7PSnaf0i";
 	DygraphController c;
 	
     @Override
@@ -75,8 +75,8 @@ final public class DygraphApplet extends JApplet{
     	ProfileQueryEngine.fetchFriendData();
         c = new DygraphController(this);
         c.launch();
-        DyGraphConsole.getInstance().display();
-        DyGraphConsole.getInstance().setController(c);
+        DygraphConsole.getInstance().display();
+        DygraphConsole.getInstance().setController(c);
     }
     
     @Override

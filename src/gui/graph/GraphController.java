@@ -1,16 +1,17 @@
 package gui.graph;
 
-import gui.graph.util.Message;
 import gui.graph.util.Data;
 import gui.graph.util.IDCounter;
+import gui.graph.util.Message;
+
 import java.awt.GridLayout;
-import java.awt.Toolkit;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+
 import javax.swing.JApplet;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
@@ -21,11 +22,8 @@ public abstract class GraphController<T extends GraphViewer> {
     
     protected static final float DEFAULT_REPULSIVE_CONST = 8192f;
     protected static final float DEFAULT_EQUILIBRIUM_LENGTH = 100;
-    protected static final float DEFAULT_UNIT_MASS = 15000;
-    
-    protected static final int DEFAULT_WIDTH = (int)(Toolkit.getDefaultToolkit().getScreenSize().width * 0.75);
-    protected static final int DEFAULT_HEIGHT = (int)(Toolkit.getDefaultToolkit().getScreenSize().height * 0.75);
-    protected static final int SCREEN_SIZE_MULT = 4;
+    protected static final int DEFAULT_UNIT_MASS = 12000;
+    protected static final int DEFAULT_HEAVY_MASS = 48000;
     
     static{
     	try{ 
@@ -38,7 +36,8 @@ public abstract class GraphController<T extends GraphViewer> {
     
     protected float repulsiveConstant = DEFAULT_REPULSIVE_CONST;
     protected float equilibriumLength = DEFAULT_EQUILIBRIUM_LENGTH;
-    protected float unitMass = DEFAULT_UNIT_MASS;
+    protected int unitMass = DEFAULT_UNIT_MASS;
+    protected int heavyMass = DEFAULT_HEAVY_MASS;
     
     protected GraphPopulator gpop;
     protected Graph graph;
@@ -49,7 +48,7 @@ public abstract class GraphController<T extends GraphViewer> {
         createViewer();
         root.setLayout(new GridLayout());
         root.add(view);
-        root.setLocation(DEFAULT_WIDTH/6,DEFAULT_HEIGHT/6);
+        root.setLocation(GraphViewer.DEFAULT_WIDTH/2,GraphViewer.DEFAULT_HEIGHT/2);
         root.setVisible(true);
         view.setLayout(null);
         addInputListeners();
@@ -184,6 +183,7 @@ public abstract class GraphController<T extends GraphViewer> {
     }
     
     public void handleMouseReleased(MouseEvent e) {
+    	view.draggingView = false;
         if (view.currentlyDragged != null) {
             view.currentlyDragged = null;
         }
@@ -201,9 +201,10 @@ public abstract class GraphController<T extends GraphViewer> {
     }
     
     public void handleMousePressed(MouseEvent e) {   
+    	int x = e.getX(),y = e.getY();
         view.requestFocus();
-        VertexPainter node = view.locateVertexPainter(e.getX(),e.getY());
-        EdgePainter edge = view.locateEdgePainter(e.getX(),e.getY());
+        VertexPainter node = view.locateVertexPainter(x,y);
+        EdgePainter edge = view.locateEdgePainter(x,y);
         if (node != null) {
             if (view.currentlyAddingEdge) {
                 if (view.getCurrentlyFocused() != null) {
@@ -247,30 +248,28 @@ public abstract class GraphController<T extends GraphViewer> {
                 view.getCurrentlySelected().inform(Message.MOUSE_DESELECTED,new Data(e));
             }
             if (e.isShiftDown() && e.getButton() == MouseEvent.BUTTON1) {
-                view.addVertex("#"+IDCounter.next(),e.getX(),e.getY());
+                view.addVertex("#"+IDCounter.next(),x,y);
             }
         }
         if (e.getButton() == MouseEvent.BUTTON3 ) {
             view.displayPopup(e);
         }
     }
+    
     public void handleMouseDragged(MouseEvent e) {
         view.requestFocus();
         int x = e.getX(),y = e.getY();
-        view.setCurPosition(x, y);
-        if (e.isShiftDown()) {
-            /* TODO : IMPLEMENT MULTIPLE SELECTION */        
+        VertexPainter node = view.locateVertexPainter(x,y);
+        if (view.currentlyDragged != null) {
+          view.currentlyDragged.inform(Message.MOUSE_DRAGGED, new Data(e));
+        } else if (node != null) {
+            node.inform(Message.MOUSE_DRAGGED, new Data(e));
+            view.currentlyDragged = node;
         } else {
-            VertexPainter node = view.locateVertexPainter(x,y);
-            if (view.currentlyDragged != null) {
-              view.currentlyDragged.inform(Message.MOUSE_DRAGGED, new Data(e));
-            } else if (node != null) {
-                node.inform(Message.MOUSE_DRAGGED, new Data(e));
-                view.currentlyDragged = node;
-            } else {
-                if (view.currentlyDragged == null) {
-                    view.dragView(e);
-                }
+            if (view.currentlyDragged == null) {
+                view.dragView(e);
+                view.draggingView = true;
+                view.setCurPosition(x, y);
             }
         }
     }

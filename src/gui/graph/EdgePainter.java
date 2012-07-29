@@ -10,6 +10,8 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
+
+import dygraph.DygraphConsole;
 import util.list.InvalidNodeException;
 import util.list.ListNode;
 import util.misc.LinearEqn2D;
@@ -17,26 +19,34 @@ import util.misc.Vector2D;
 
 public class EdgePainter extends AbstractPainter implements ISpringController,IMouseContainer{
 
-    static final int DEFAULT_DISPLACEMENT_ERROR = 4;
+    protected static final int DEFAULT_DISPLACEMENT_ERROR = 4;
+    protected static final float DEFAULT_DASH_PHASE = 1f;
+    protected static final float[] DEFAULT_DASH = new float[] {5f};
     
-    static final Color[] EDGE_COLORS = new Color[3];
+    protected static final Color[] EDGE_COLORS = new Color[5];
     static{
         EDGE_COLORS[AbstractPainter.DEFAULT] = Color.GRAY;
+        EDGE_COLORS[AbstractPainter.HIGHLIGHTED] = Color.BLUE;
         EDGE_COLORS[AbstractPainter.FOCUSED] = Color.DARK_GRAY;
+        EDGE_COLORS[AbstractPainter.ACCENTUATED] = Color.RED;
         EDGE_COLORS[AbstractPainter.SELECTED] = Color.BLACK;
     }
     
+    /* Graphics-related components */
+    protected BasicStroke defaultStroke;
+    protected BasicStroke focusedStroke;
+    
     /* Graph-related components */
-    VertexPainter vp1;
-    VertexPainter vp2;
-    volatile LinearEqn2D eqn;
-    ListNode myListNode;
+    protected VertexPainter vp1;
+    protected VertexPainter vp2;
+    protected volatile LinearEqn2D eqn;
+    protected ListNode myListNode;
     
     /* Physics-related components */
-    float weight;
-    float k;
-    float equilibrium;
-    volatile float currentLength;
+    protected float weight;
+    protected float k;
+    protected float equilibrium;
+    protected volatile float currentLength;
 
     
     public EdgePainter(GraphViewer graphPane,VertexPainter vp1, VertexPainter vp2,String label){
@@ -54,19 +64,29 @@ public class EdgePainter extends AbstractPainter implements ISpringController,IM
         this.updateVertices();
         this.id = label;
         this.weight = weight;
-        
+        this.updateStrokes();
         /* Initializing physics-related components */
         k = ISpringController.DEFAULT_K; // Change to scale to edge weight.
         equilibrium = myParent.controller.equilibriumLength;
         currentLength = equilibrium;
     }
     
+    protected void updateStrokes() {
+    	float width = weight > 8 ? 8 : weight;
+        //this.defaultStroke = new BasicStroke(width,BasicStroke.CAP_BUTT,
+        //		BasicStroke.JOIN_BEVEL,10f,DEFAULT_DASH,DEFAULT_DASH_PHASE);
+    	this.defaultStroke = new BasicStroke(width);
+        this.focusedStroke = new BasicStroke(width);
+    }
+    
     public void setWeight(float weight) {
     	this.weight = weight;
+    	updateStrokes();
     }
     
     public void addWeight(float weight) {
     	this.weight += weight;
+    	updateStrokes();
     }
     
     public VertexPainter[] getConnectingVertices() {
@@ -83,19 +103,20 @@ public class EdgePainter extends AbstractPainter implements ISpringController,IM
         switch(message){
             
             case MOUSE_OVER:
-                if (!(state == AbstractPainter.SELECTED)) {
+                if (!(state == AbstractPainter.SELECTED || state == AbstractPainter.ACCENTUATED)) {
                     setState(FOCUSED);
                 }
                 break;
                 
             case MOUSE_EXITED:
-                if (!(state == AbstractPainter.SELECTED)) {
+                if (!(state == AbstractPainter.SELECTED || state == AbstractPainter.ACCENTUATED)) {
                     setState(DEFAULT);
                 }
                 break;
                 
             case MOUSE_CLICKED:
                 setState(SELECTED);
+                DygraphConsole.tryLog("You have selected item " + id + "; weight=" + weight);
                 break;
                 
             case MOUSE_DRAGGED:
@@ -119,7 +140,7 @@ public class EdgePainter extends AbstractPainter implements ISpringController,IM
     
     
     @Override
-    boolean contains(int x, int y) {
+    public boolean contains(int x, int y) {
         return eqn.contains(x, y);
     }
     @Override
@@ -144,10 +165,11 @@ public class EdgePainter extends AbstractPainter implements ISpringController,IM
         Color origColor = g.getColor();
         
         g.setColor(c);
-        if (state == AbstractPainter.DEFAULT) {
-        	g2d.setStroke(new BasicStroke(2));
+        
+        if (state == DEFAULT) {
+        	g2d.setStroke(defaultStroke);
         } else {
-        	g2d.setStroke(new BasicStroke(4));
+        	g2d.setStroke(focusedStroke);
         }
         
         g.drawLine(vp1.x,vp1.y,vp2.x,vp2.y);
@@ -205,11 +227,13 @@ public class EdgePainter extends AbstractPainter implements ISpringController,IM
     }
     
     /* TODO THIS METHOD SUCKS...MAKE IT NOT RETARDED*/
-    void remove() {
+    protected void remove() {
         try{
             myListNode.remove();
             vp1.myEdges.remove(this);
             vp2.myEdges.remove(this);
+            myParent.edgePainterMap.remove(id);
+            myParent.graph.removeEdge(id);
         } catch (InvalidNodeException e){
             System.err.println("Error: failed to remove edge due to invalid "
                     + "listnode reference.");
@@ -220,10 +244,20 @@ public class EdgePainter extends AbstractPainter implements ISpringController,IM
 	protected void paintDefault(Graphics g) {
 		paintLine(g, EDGE_COLORS[AbstractPainter.DEFAULT]);
 	}
+	
+	@Override
+	protected void paintHighlighted(Graphics g) {
+		paintLine(g, EDGE_COLORS[AbstractPainter.HIGHLIGHTED]);
+	}
 
 	@Override
 	protected void paintFocused(Graphics g) {
 		paintLine(g, EDGE_COLORS[AbstractPainter.FOCUSED]);
+	}
+	
+	@Override
+	protected void paintAccentuated(Graphics g) {
+		paintLine(g, EDGE_COLORS[AbstractPainter.ACCENTUATED]);
 	}
 
 	@Override

@@ -6,17 +6,16 @@ import gui.graph.util.Message;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import dygraph.DygraphConsole;
 
 import util.dict.CoordinateTable2D;
 import util.list.InvalidNodeException;
@@ -28,7 +27,10 @@ public class VertexPainter extends AbstractPainter implements IMassController,
 
 	protected final static int RADIUS = 12;
 	protected final static Color[][] STATE_COLORS = new Color[][] {
-			{ Color.WHITE, Color.DARK_GRAY }, { Color.WHITE, Color.BLUE },
+			{ Color.WHITE, Color.DARK_GRAY },
+			{ Color.WHITE, Color.BLUE },
+			{ Color.WHITE, Color.BLUE },
+			{ Color.WHITE, Color.RED },
 			{ Color.WHITE, Color.RED }, };
 
 	/* Graph-related components */
@@ -82,17 +84,32 @@ public class VertexPainter extends AbstractPainter implements IMassController,
 		case MOUSE_OVER:
 			if (!(state == AbstractPainter.SELECTED)) {
 				setState(FOCUSED);
+				for (EdgePainter ep : myEdges) {
+					ep.setState(HIGHLIGHTED);
+				}
 			}
 			break;
-
+			
 		case MOUSE_EXITED:
 			if (!(state == AbstractPainter.SELECTED)) {
 				setState(DEFAULT);
+				for (EdgePainter ep : myEdges) {
+					if (ep.vp1.state == SELECTED || ep.vp2.state == SELECTED) {
+						ep.setState(ACCENTUATED);
+					} else {
+						ep.setState(DEFAULT);
+					}
+				}
 			}
 			break;
 
 		case MOUSE_CLICKED:
 			setState(SELECTED);
+			DygraphConsole.tryLog("You have selected vertex " + id + ";" +
+					" weight=" + myParent.graph.findVertex(id).weight());
+			for (EdgePainter ep : myEdges) {
+				ep.setState(ACCENTUATED);
+			}
 			break;
 
 		case MOUSE_DRAGGED:
@@ -101,6 +118,9 @@ public class VertexPainter extends AbstractPainter implements IMassController,
 
 		case MOUSE_DESELECTED:
 			setState(DEFAULT);
+			for (EdgePainter ep : myEdges) {
+				ep.setState(DEFAULT);
+			}
 			break;
 
 		default:
@@ -111,11 +131,12 @@ public class VertexPainter extends AbstractPainter implements IMassController,
 	}
 
 	protected void remove() {
-		myParent.vertexTable.remove(new Point(x, y));
 		try {
 			for (EdgePainter ep : myEdges) {
 				ep.remove();
 			}
+			myParent.vertexTable.remove(new Point(x, y));
+			myParent.graph.removeVertex(id);
 			myListNode.remove();
 		} catch (InvalidNodeException e) {
 			System.err.println("Error: Failed to remove NodePainter due to "
@@ -124,19 +145,22 @@ public class VertexPainter extends AbstractPainter implements IMassController,
 	}
 
 	protected void moveTo(int xPos, int yPos) {
-		Point old_p = new Point(x, y);
-		Point new_p = new Point(xPos, yPos);
-		if (myParent.bounds.contains(new_p)) {
-			Point newRegion = myTable.findRegion(old_p);
+		if (myParent.bounds.contains(xPos,yPos)) {
+			Point newRegion = myTable.findRegion(x,y);
 			if (!newRegion.equals(curRegion)) {
-				myTable.remove(old_p, this);
-				myTable.insert(new_p, this);
+				myTable.remove(x,y, this);
+				myTable.insert(xPos,yPos, this);
 			}
-			this.x = xPos;
-			this.y = yPos;
-			for (EdgePainter ep : myEdges) {
-				ep.inform(Message.REQUEST_UPDATE, null);
-			}
+			x = xPos;
+			y = yPos;
+		} else {
+			myTable.remove(x,y, this);
+			x += xPos - x > 0 ? 1 : -1;
+			y += yPos - y > 0 ? 1 : -1;
+			myTable.insert(x,y, this);
+		}
+		for (EdgePainter ep : myEdges) {
+			ep.inform(Message.REQUEST_UPDATE, null);
 		}
 	}
 
@@ -149,7 +173,7 @@ public class VertexPainter extends AbstractPainter implements IMassController,
 	}
 
 	@Override
-	protected boolean contains(int x, int y) {
+	public boolean contains(int x, int y) {
 		return Math.pow(this.x - x, 2) + Math.pow(this.y - y, 2) <= VertexPainter.RADIUS
 				* VertexPainter.RADIUS;
 	}
@@ -157,6 +181,13 @@ public class VertexPainter extends AbstractPainter implements IMassController,
 	@Override
 	public boolean contains(Point p) {
 		return contains(p.x, p.y);
+	}
+	
+	@Override
+	protected void paintHighlighted(Graphics g) {
+		Graphics2D g2d = (Graphics2D) g;
+		paintCircularVertex(g2d, STATE_COLORS[AbstractPainter.HIGHLIGHTED][0],
+				STATE_COLORS[AbstractPainter.HIGHLIGHTED][1]);
 	}
 
 	@Override
@@ -171,6 +202,13 @@ public class VertexPainter extends AbstractPainter implements IMassController,
 		Graphics2D g2d = (Graphics2D) g;
 		paintCircularVertex(g2d, STATE_COLORS[AbstractPainter.FOCUSED][0],
 				STATE_COLORS[AbstractPainter.FOCUSED][1]);
+	}
+	
+	@Override
+	protected void paintAccentuated(Graphics g) {
+		Graphics2D g2d = (Graphics2D) g;
+		paintCircularVertex(g2d, STATE_COLORS[AbstractPainter.ACCENTUATED][0],
+				STATE_COLORS[AbstractPainter.ACCENTUATED][1]);
 	}
 
 	@Override
@@ -207,14 +245,15 @@ public class VertexPainter extends AbstractPainter implements IMassController,
 
 	@Override
 	public float mass() {
-
-		int diffX = x - myParent.curX;
-		int diffY = y - myParent.curY;
-		if (diffX*diffX + diffY*diffY < 40000) {
-			return 4*myParent.controller.unitMass;
-		} else {
-			return myParent.controller.unitMass;
+		if (myEdges.isEmpty()) {
+			return Float.MAX_VALUE;
 		}
+		if (state == SELECTED) {
+			return myParent.controller.heavyMass;
+		}
+		// int diffX = x - myParent.curX;
+		// int diffY = y - myParent.curY;
+		return myParent.controller.unitMass;
 	}
 
 	@Override

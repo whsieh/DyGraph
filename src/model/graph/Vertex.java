@@ -5,6 +5,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import dygraph.DygraphConsole;
+
 public class Vertex extends GraphItem implements Iterable<Edge>{
 
     protected Map<Vertex,Edge> edges;

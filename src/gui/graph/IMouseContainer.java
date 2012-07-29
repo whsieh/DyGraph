@@ -6,4 +6,6 @@ public interface IMouseContainer {
     
     public boolean contains(Point p);
     
+    public boolean contains(int x, int y);
+    
 }

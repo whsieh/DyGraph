@@ -1,12 +1,8 @@
 package dygraph;
 
 import gui.graph.AbstractPainter;
-import gui.graph.EdgePainter;
 import gui.graph.GraphController;
-import gui.graph.GraphViewer;
 import gui.graph.VertexPainter;
-import gui.graph.util.Data;
-import gui.graph.util.IDCounter;
 import gui.graph.util.Message;
 
 import java.awt.Component;
@@ -15,12 +11,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import javax.swing.JApplet;
-
-import dygraph.DygraphPopulator;
-
-import stat.comm.CommunityTransformer;
 
 public class DygraphController extends GraphController<DygraphViewer> {
     
@@ -63,6 +53,25 @@ public class DygraphController extends GraphController<DygraphViewer> {
     }
     
     @Override
+    public void handleMousePressed(MouseEvent e) {
+    	int x = e.getX(), y = e.getY();
+    	if (e.isShiftDown() && e.getButton() == 1) {
+    		FacebookVertexPainter fvp = dView.locateVertexPainter(x, y);
+    		if (fvp != null) {
+    			dView.expandProfileConnections(fvp.getID(), 5);
+    			AbstractPainter ap = dView.getCurrentlySelected();
+    			if (ap != null) {
+    				ap.inform(Message.MOUSE_DESELECTED, null);
+    			}
+    			dView.setCurrentlySelected(fvp);
+    			fvp.inform(Message.MOUSE_CLICKED, null);
+    		}
+    	} else {
+    		super.handleMousePressed(e);
+		}
+    }
+    
+    @Override
     public void handleKeyReleased(KeyEvent e) {
     	if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
     		mode = Mode.DEFAULT;
@@ -85,7 +94,7 @@ public class DygraphController extends GraphController<DygraphViewer> {
     	try {
 			((DygraphApplet)root).popURL(new URL(url));
 		} catch (MalformedURLException e) {
-			DyGraphConsole.tryErr("Failed to popup new URL (" + url + ")");
+			DygraphConsole.tryErr("Failed to popup new URL (" + url + ")");
 		}
     }
 

@@ -1,9 +1,8 @@
 package dygraph;
 
-import java.io.IOException;
-
-import gui.graph.*;
-import java.awt.image.BufferedImage;
+import gui.graph.AbstractPainter;
+import gui.graph.GraphViewer;
+import gui.graph.VertexPainter;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -14,8 +13,6 @@ import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.image.BufferedImage;
 
-import util.misc.ImageLibrary;
-
 public class FacebookVertexPainter extends VertexPainter{
 
 	// TODO profile pic painting, (EDITED: don't worry about the mouseover effect thing. That'll make things
@@ -24,6 +21,8 @@ public class FacebookVertexPainter extends VertexPainter{
     protected BufferedImage image;
     protected int width;
     protected int height;
+    
+    protected DygraphViewer dView;
     
     protected volatile boolean isLoading;
 	private int degree = 0;
@@ -37,6 +36,9 @@ public class FacebookVertexPainter extends VertexPainter{
         image = ProfileQueryEngine.fetchPicture(id);
         this.width = image.getWidth();
         this.height = image.getHeight();
+		if (graphPane instanceof DygraphViewer) {
+			dView = (DygraphViewer)graphPane;
+		}
     }
     
 	protected String getDisplayName() {
@@ -53,6 +55,14 @@ public class FacebookVertexPainter extends VertexPainter{
 	public boolean isLoading() {
 		return isLoading;
 	}
+	
+	@Override
+	public void remove() {
+		super.remove();
+		if (dView != null) {
+			dView.profileSet.remove(id);
+		}
+	}
     
     @Override
     protected void paintDefault(Graphics g) {
@@ -60,6 +70,13 @@ public class FacebookVertexPainter extends VertexPainter{
         paintProfilePicture(g2d, STATE_COLORS[AbstractPainter.DEFAULT][0],
         STATE_COLORS[AbstractPainter.DEFAULT][1]);
     }
+    
+	@Override
+	protected void paintHighlighted(Graphics g) {
+		Graphics2D g2d = (Graphics2D) g;
+		paintProfilePicture(g2d, STATE_COLORS[AbstractPainter.HIGHLIGHTED][0],
+				STATE_COLORS[AbstractPainter.HIGHLIGHTED][1]);
+	}
 
     @Override
     protected void paintFocused(Graphics g) {
@@ -76,7 +93,7 @@ public class FacebookVertexPainter extends VertexPainter{
     }
     
     @Override
-    protected boolean contains(int xPos, int yPos) {
+    public boolean contains(int xPos, int yPos) {
     	int halfX = width/2;
     	int halfY = height/2;
     	return (x - halfX < xPos && xPos < x + halfX) && (y - halfY < yPos && yPos < y + halfY);
@@ -84,10 +101,11 @@ public class FacebookVertexPainter extends VertexPainter{
     
     private void paintProfilePicture(Graphics2D g2d, Color cInner, Color cOuter) {
     	
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+				RenderingHints.VALUE_ANTIALIAS_ON);
+    	
         Color c = g2d.getColor();
         Stroke s = g2d.getStroke();
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-        RenderingHints.VALUE_ANTIALIAS_ON);
 
         int halfWidth = width/2;
         int halfHeight = height/2;
@@ -108,14 +126,16 @@ public class FacebookVertexPainter extends VertexPainter{
         g2d.drawImage(image, x - halfWidth, y - halfHeight,	myParent);
         
         if (isLoading) {
-        	g2d.drawImage(ImageLibrary.grabImage("http://dygraph.herobo.com/img/green_plus.png", true), x+halfWidth, y-halfHeight-25, myParent);
+        	g2d.drawImage(DygraphResource.GREEN_PLUS, x+halfWidth, y-halfHeight-25, myParent);
         }
         g2d.setFont(new Font("Arial", 1, 16));
         g2d.drawString(displayName, x - halfWidth - 15, y + halfHeight + 15);
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-        RenderingHints.VALUE_ANTIALIAS_OFF);
         g2d.setStroke(s);
         g2d.setColor(c);
+        
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+				RenderingHints.VALUE_ANTIALIAS_OFF);
+        
     }
 
 }

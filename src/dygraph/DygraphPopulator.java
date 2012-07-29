@@ -57,8 +57,8 @@ public class DygraphPopulator extends GraphPopulator {
 			} else {
 				mentioned.add(id);
 				ProfileQueryEngine engine = fbView.getProfile(id);
-				if (DyGraphConsole.exists()) {
-					DyGraphConsole.getInstance().log("Currently on query " + queries + "/" + SEARCH_VOLUME + ", " + engine.user.getName());
+				if (DygraphConsole.exists()) {
+					DygraphConsole.getInstance().log("Currently on query " + queries + "/" + SEARCH_VOLUME + ", " + engine.user.getName());
 				}
 				FacebookVertexPainter vp = fbView.getFacebookProfilePainter(id);
 				if (vp != null) {
@@ -73,18 +73,6 @@ public class DygraphPopulator extends GraphPopulator {
 				}
 			}
 		}
-		Graph g = fbView.getGraph();
-		int deltaCount = 0;
-		do {
-			deltaCount = 0;
-			for (String id : g.vertices()) {
-				Vertex v = g.findVertex(id);
-				if (v.degree() <= 1.0) {
-					deltaCount++;
-					fbView.removeVertex(id);
-				}
-			}
-		} while(deltaCount > 0);
 	}
 
 	

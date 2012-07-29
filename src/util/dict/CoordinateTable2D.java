@@ -1,18 +1,19 @@
 package util.dict;
 
 import gui.graph.IMouseContainer;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class CoordinateTable2D<V> {
     
-    static final public int DIM = 10;
+    static final public int DIM = 32;
     
     int size;
     int dim;
@@ -24,7 +25,7 @@ public class CoordinateTable2D<V> {
     public CoordinateTable2D(int minX, int minY, int maxX, int maxY) {
         this.size = 0;
         this.dim = DIM;
-        this.buckets = (List  <V>[][])
+        this.buckets = (List<V>[][])
                 new List [DIM][DIM];
         this.minX = minX;
         this.minY = minY;
@@ -42,6 +43,10 @@ public class CoordinateTable2D<V> {
     
     public Point findRegion(Point p) {
         return new Point(p.x/gapX - xShift,p.y/gapY - yShift);
+    }
+    
+    public Point findRegion(int x, int y) {
+        return new Point(x/gapX - xShift,y/gapY - yShift);
     }
 
     public int size() {
@@ -87,8 +92,25 @@ public class CoordinateTable2D<V> {
             size++;
             return value;
         }catch(IndexOutOfBoundsException e) {
-            System.err.println("You have clipped through the edge of the"
-                    + " graph panel. Java will pretend it saw nothing :)");
+            //System.err.println("You have clipped through the edge of the"
+            //        + " graph panel. Java will pretend it saw nothing :)");
+            return null;
+        }
+    }
+    
+    public V insert(int x, int y, V value) {
+        try{
+            Point region = findRegion(x,y);
+            if (buckets[region.x][region.y] == null) {
+                buckets[region.x][region.y] = 
+                        new CopyOnWriteArrayList <V>();
+            }
+            buckets[region.x][region.y].add(value);
+            size++;
+            return value;
+        }catch(IndexOutOfBoundsException e) {
+            // System.err.println("You have clipped through the edge of the"
+            // 		+ " graph panel. Java will pretend it saw nothing :)");
             return null;
         }
     }
@@ -120,6 +142,27 @@ public class CoordinateTable2D<V> {
             }
             for (V e : buckets[region.x][region.y]) {
                 if (((IMouseContainer)(e)).contains(key) && v == e) {
+                    buckets[region.x][region.y].remove(e);
+                    size--;
+                    return e;
+                }
+            }
+            return null;
+        }catch(IndexOutOfBoundsException e) {
+            System.err.println("You have clipped through the edge of the"
+                    + " graph panel. Java will pretend it saw nothing :)");
+            return null;
+        }
+    }
+    
+    public V remove(int x, int y, V v) {
+        try{
+            Point region = findRegion(x,y);
+            if (buckets[region.x][region.y] == null) {
+                return null;
+            }
+            for (V e : buckets[region.x][region.y]) {
+                if (((IMouseContainer)(e)).contains(x,y) && v == e) {
                     buckets[region.x][region.y].remove(e);
                     size--;
                     return e;
