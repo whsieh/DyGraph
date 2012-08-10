@@ -1,8 +1,9 @@
 package gui.graph;
 
-import gui.graph.util.Message;
-import gui.graph.util.Data;
 import gui.graph.physics.ISpringController;
+import gui.graph.util.Data;
+import gui.graph.util.Message;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -11,11 +12,12 @@ import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
 
-import dygraph.DygraphConsole;
+import model.graph.Edge;
 import util.list.InvalidNodeException;
 import util.list.ListNode;
 import util.misc.LinearEqn2D;
 import util.misc.Vector2D;
+import dygraph.DygraphConsole;
 
 public class EdgePainter extends AbstractPainter implements ISpringController,IMouseContainer{
 
@@ -39,8 +41,9 @@ public class EdgePainter extends AbstractPainter implements ISpringController,IM
     /* Graph-related components */
     protected VertexPainter vp1;
     protected VertexPainter vp2;
-    protected volatile LinearEqn2D eqn;
+    protected LinearEqn2D eqn;
     protected ListNode myListNode;
+    protected GraphViewer myParent;
     
     /* Physics-related components */
     protected float weight;
@@ -137,7 +140,9 @@ public class EdgePainter extends AbstractPainter implements ISpringController,IM
         }
     }
     
-    
+    public Edge getEdge() {
+    	return myParent.graph.findEdge(id);
+    }
     
     @Override
     public boolean contains(int x, int y) {
@@ -218,7 +223,7 @@ public class EdgePainter extends AbstractPainter implements ISpringController,IM
     public Vector2D force() {
         Vector2D v = LinearEqn2D.toUnitVector(eqn,Vector2D.FORCE);
         // System.out.println("    Unit vector: " + v);
-        return v.scaleTo(k*displacement());
+        return weight > 7 ? v.scaleTo(2*k*displacement()) : v.scaleTo(k*displacement());
     }
 
     @Override

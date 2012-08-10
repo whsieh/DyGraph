@@ -1,10 +1,10 @@
 package gui.graph;
 
-import gui.graph.util.Message;
 import gui.graph.util.Data;
+import gui.graph.util.Message;
+
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
@@ -22,7 +22,6 @@ public abstract class AbstractPainter {
     protected static final int SELECTED = 4;
     
     protected int state;
-    protected GraphViewer myParent;
     protected String id;
     
     protected abstract boolean contains(int x, int y);

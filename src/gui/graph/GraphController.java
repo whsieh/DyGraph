@@ -184,18 +184,16 @@ public abstract class GraphController<T extends GraphViewer> {
     
     public void handleMouseReleased(MouseEvent e) {
     	view.draggingView = false;
-        if (view.currentlyDragged != null) {
-            view.currentlyDragged = null;
+        view.currentlyDragged = null;
+        if ( view.currentlyFocused != null) {
+            view.currentlyFocused.inform(Message.MOUSE_EXITED, new Data(e));
+            view.currentlyFocused = null;
         }
-        if ( view.getCurrentlyFocused() != null) {
-            view.getCurrentlyFocused().inform(Message.MOUSE_EXITED, new Data(e));
-            view.setCurrentlyFocused(null);
-        }
-        if (view.getCurrentlySelected() != null) {
+        if (view.currentlySelected != null) {
         	if (!((view.curX - 10 < e.getX() && e.getX() < view.curX + 10) &&
         			(view.curY - 10 < e.getY() && e.getY() < view.curY + 10))) {
-	        	view.getCurrentlySelected().inform(Message.MOUSE_DESELECTED, new Data(e));
-	        	view.setCurrentlySelected(null);
+	        	view.currentlySelected.inform(Message.MOUSE_DESELECTED, new Data(e));
+	        	view.currentlySelected = null;
         	}
         }
     }
@@ -225,7 +223,8 @@ public abstract class GraphController<T extends GraphViewer> {
                 if ( view.getCurrentlySelected() != null ) {
                     view.getCurrentlySelected().inform(Message.MOUSE_DESELECTED,new Data(e));
                 }
-                view.setCurrentlySelected(node);
+                view.currentlyDragged = node;
+                view.currentlySelected = node;
                 node.inform(Message.MOUSE_CLICKED,new Data(e));
                 if (e.isShiftDown()  && newEdgeEnabled()) {
                     view.currentlyAddingEdge = true;
@@ -265,6 +264,7 @@ public abstract class GraphController<T extends GraphViewer> {
         } else if (node != null) {
             node.inform(Message.MOUSE_DRAGGED, new Data(e));
             view.currentlyDragged = node;
+            view.setCurPosition(x, y);
         } else {
             if (view.currentlyDragged == null) {
                 view.dragView(e);

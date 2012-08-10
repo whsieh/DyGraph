@@ -53,8 +53,8 @@ public class ImageLibrary {
                 }
                 images.put(imageName, i);
             } catch (IOException e) {
-                System.err.println("ERROR: image resource not found."
-                        + " Exiting application.");
+                System.err.println("ERROR: image resource not found: "
+                        + imageName);
                 System.exit(1);
             }
         } else {

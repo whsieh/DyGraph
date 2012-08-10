@@ -15,6 +15,9 @@ import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import model.graph.GraphItem;
+import model.graph.Vertex;
+
 import dygraph.DygraphConsole;
 
 import util.dict.CoordinateTable2D;
@@ -38,15 +41,19 @@ public class VertexPainter extends AbstractPainter implements IMassController,
 	protected CoordinateTable2D<VertexPainter> myTable;
 	protected List<EdgePainter> myEdges;
 	protected String displayName;
+    protected GraphViewer myParent;
 	
-	volatile protected int x;
-	volatile protected int y;
+	volatile public int x;
+	volatile public int y;
 	volatile protected Point curRegion;
+	
+	private int deltaX;
+	private int deltaY;
 
 	/* Physics-related components */
-	volatile protected Vector2D position;
-	volatile protected Vector2D velocity;
-	volatile protected Vector2D acceleration;
+	public volatile Vector2D position;
+	public volatile Vector2D velocity;
+	public volatile Vector2D acceleration;
 
 	protected VertexPainter(GraphViewer graphPane, int xPos, int yPos,
 			String id, String displayName) {
@@ -129,13 +136,17 @@ public class VertexPainter extends AbstractPainter implements IMassController,
 			break;
 		}
 	}
+	
+	public Vertex getVertex() {
+		return myParent.graph.findVertex(id);
+	}
 
 	protected void remove() {
 		try {
 			for (EdgePainter ep : myEdges) {
 				ep.remove();
 			}
-			myParent.vertexTable.remove(new Point(x, y));
+			myParent.vertexTable.remove(new Point(x, y),this);
 			myParent.graph.removeVertex(id);
 			myListNode.remove();
 		} catch (InvalidNodeException e) {
@@ -151,12 +162,14 @@ public class VertexPainter extends AbstractPainter implements IMassController,
 				myTable.remove(x,y, this);
 				myTable.insert(xPos,yPos, this);
 			}
+			setDeltaX(xPos - x);
+			setDeltaY(yPos - y);
 			x = xPos;
 			y = yPos;
 		} else {
 			myTable.remove(x,y, this);
-			x += xPos - x > 0 ? 1 : -1;
-			y += yPos - y > 0 ? 1 : -1;
+			x += xPos - x > 0 ? -1 : 1;
+			y += yPos - y > 0 ? -1 : 1;
 			myTable.insert(x,y, this);
 		}
 		for (EdgePainter ep : myEdges) {
@@ -301,6 +314,22 @@ public class VertexPainter extends AbstractPainter implements IMassController,
 			velocity.setZero();
 		}
 		acceleration.setZero();
+	}
+
+	public int getDeltaX() {
+		return deltaX;
+	}
+
+	public void setDeltaX(int deltaX) {
+		this.deltaX = deltaX;
+	}
+
+	public int getDeltaY() {
+		return deltaY;
+	}
+
+	public void setDeltaY(int deltaY) {
+		this.deltaY = deltaY;
 	}
 
 }

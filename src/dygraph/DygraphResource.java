@@ -10,7 +10,12 @@ public final class DygraphResource {
 		/* Should never access this constructor */
 	}
 	
-	final public static Image GREEN_PLUS = 
-			ImageLibrary.grabImage("http://dygraph.herobo.com/img/green_plus.png", true);
+	public static void loadAll() {
+		GREEN_PLUS = ImageLibrary.grabImage("http://dygraph.herobo.com/img/green_plus.png", true);
+		CAT_PICTURE = ImageLibrary.grabImage("http://dygraph.herobo.com/img/cat_picture.jpg");
+	}
+	
+	public static Image GREEN_PLUS = null;
+	public static Image CAT_PICTURE = null;
 	
 }

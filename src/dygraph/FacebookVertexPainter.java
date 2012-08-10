@@ -1,22 +1,31 @@
 package dygraph;
 
 import gui.graph.AbstractPainter;
+import gui.graph.EdgePainter;
 import gui.graph.GraphViewer;
 import gui.graph.VertexPainter;
+import gui.graph.util.Data;
+import gui.graph.util.Message;
 
+import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Composite;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.util.List;
+
+import dygraph.DygraphController.Mode;
 
 public class FacebookVertexPainter extends VertexPainter{
-
-	// TODO profile pic painting, (EDITED: don't worry about the mouseover effect thing. That'll make things
-	// too complicated. A context menu is enough)
+	
+	private final static AlphaComposite ALPHA_COMP = 
+			AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.25f);
 	
     protected BufferedImage image;
     protected int width;
@@ -25,13 +34,12 @@ public class FacebookVertexPainter extends VertexPainter{
     protected DygraphViewer dView;
     
     protected volatile boolean isLoading;
-	private int degree = 0;
-    
-	FacebookVertexPainter(GraphViewer graphPane, int xPos, int yPos, String id) {
+
+	public FacebookVertexPainter(GraphViewer graphPane, int xPos, int yPos, String id) {
 		this(graphPane, xPos, yPos, id, id);
 	}
 	
-    FacebookVertexPainter(GraphViewer graphPane, int xPos, int yPos, String id, String displayName) {
+    public FacebookVertexPainter(GraphViewer graphPane, int xPos, int yPos, String id, String displayName) {
         super(graphPane, xPos, yPos, id, displayName);
         image = ProfileQueryEngine.fetchPicture(id);
         this.width = image.getWidth();
@@ -41,15 +49,31 @@ public class FacebookVertexPainter extends VertexPainter{
 		}
     }
     
+	@Override
+	public void inform(Message message, Data d) {
+		java.util.Set<String> messages = new java.util.HashSet<String>(); 
+		if (message == Message.MOUSE_CLICKED) {
+			for (EdgePainter ep : myEdges) {
+				List<String> postData = (List<String>)ep.getEdge().getData("post");
+				if (postData != null) {
+					for (String msg : postData) {
+						messages.add(msg);
+					}
+				}
+			}
+			for (String msg : messages) {
+				System.out.println("\n\n\n" + msg);
+			}
+		}
+		super.inform(message, d);
+	}
+    
 	protected String getDisplayName() {
 		return displayName;
 	}
 	
 	public void setLoading(boolean isLoading) {
 		this.isLoading = isLoading;
-		if (!isLoading) {
-			degree = 0;
-		}
 	}
 	
 	public boolean isLoading() {
@@ -120,10 +144,17 @@ public class FacebookVertexPainter extends VertexPainter{
         } else {
         	g2d.setStroke(new BasicStroke(4));
         }
-        
-        g2d.drawRoundRect(x - 2 - halfWidth, y - 2 - halfHeight, width+2, height+2,5,5);
-        
-        g2d.drawImage(image, x - halfWidth, y - halfHeight,	myParent);
+        if (dView.dController.getMode() == Mode.COMPARE) {
+        	Composite composite = g2d.getComposite();
+        	g2d.fillOval(x - 8, y - 8, 16, 16);
+        	g2d.setComposite(ALPHA_COMP);
+            g2d.drawRoundRect(x - 2 - halfWidth, y - 2 - halfHeight, width+2, height+2,5,5);
+            g2d.drawImage(image, x - halfWidth, y - halfHeight,	myParent);
+            g2d.setComposite(composite);
+        } else {
+	        g2d.drawRoundRect(x - 2 - halfWidth, y - 2 - halfHeight, width+2, height+2,5,5);
+	        g2d.drawImage(image, x - halfWidth, y - halfHeight,	myParent);
+        }
         
         if (isLoading) {
         	g2d.drawImage(DygraphResource.GREEN_PLUS, x+halfWidth, y-halfHeight-25, myParent);

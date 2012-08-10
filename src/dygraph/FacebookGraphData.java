@@ -66,7 +66,7 @@ public class FacebookGraphData extends GraphData <FacebookGraphData.FacebookVert
 
 	class FacebookEdgeData implements IEdgeData {
 
-		String messageID;
+		String message;
 		String id,user1,user2;
 		float weight;
 		
@@ -81,7 +81,7 @@ public class FacebookGraphData extends GraphData <FacebookGraphData.FacebookVert
 				this.user1 = user2;
 				this.user2 = user1;
 			}
-			messageID = mID;
+			message = mID;
 			this.weight = weight;
 		}
 		
@@ -95,8 +95,8 @@ public class FacebookGraphData extends GraphData <FacebookGraphData.FacebookVert
 			return new String[] {user1, user2};
 		}
 		
-		public String getMessageID() {
-			return messageID;
+		public String getMessage() {
+			return message;
 		}
 		
 		public void addCommentWeight() {
@@ -128,7 +128,7 @@ public class FacebookGraphData extends GraphData <FacebookGraphData.FacebookVert
 		for (IEdgeData e : getEdgeInfo()) {
 			FacebookEdgeData fe = (FacebookEdgeData)e;
 			s.append("\tParticipant ID: " + fe.user1 + " and " + fe.user2 + 
-					"\n\t\tMessage ID: " + fe.getMessageID() + "\n");
+					"\n\t\tMessage ID: " + fe.getMessage() + "\n");
 		}
 		return s.toString();
 	}

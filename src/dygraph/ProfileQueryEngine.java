@@ -27,11 +27,13 @@ import com.restfb.types.User;
 
 public class ProfileQueryEngine {
 	
-	final private static String DEFAULT_ACCESS_TOKEN = "AAAG4zd1akV4BAA1dEQlzuCIZBp46BrpO3nmGgodszuz4JBsVvqYe4ZBtkwkhVPJeV3YdwzJU5MHd3ZAJl0mb33LLr0JD0iOMLAqHDp98UOEnuNvWaVC";
+	final private static String DEFAULT_ACCESS_TOKEN = "AAAG4zd1akV4BAPB54XwzAJoIE6OU8Pg7ZChIjqWUtAwv0fB5CBUZBDh4ZBtqqRUlF67JZAn2hQDm2iivZBmQh9UT4G0UmIhk9S1ZB4KyGEZB4IXpER0FMCZA";
 	public static FacebookClient FB = new DefaultFacebookClient(DEFAULT_ACCESS_TOKEN);
 	final static String DEFAULT_PICTURE_URL = "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-snc4/174597_20531316728_2866555_q.jpg";
 	final public static Map<String,String> MY_FRIENDS = new HashMap<String,String>(300);
 	public static Entry<String,String> CURRENT_USER;
+	
+	final private static String[] FAVORITES_CATEGORIES = {"music","books","movies","activities","interests"};
 	
 	User user;
 	String profileID;
@@ -39,23 +41,23 @@ public class ProfileQueryEngine {
 	Iterator<List<Post>> myFeed;
 	
 	public static void main(String[] args) {
-		
-		/* Finding friends */
-		ProfileQueryEngine.fetchFriendData();
-		for (String id : MY_FRIENDS.keySet()) {
-			System.out.println(MY_FRIENDS.get(id) + " (ID:" + id + ")");
-		}
-		System.out.println("Total: " + MY_FRIENDS.size());
-		
-		/* Parsing post data */
+		/* Sample code for using ProfileQueryEngine */
+//		ProfileQueryEngine.fetchFriendData();
+//		for (String id : MY_FRIENDS.keySet()) {
+//			System.out.println(MY_FRIENDS.get(id) + " (ID:" + id + ")");
+//		}
+//		System.out.println("Total: " + MY_FRIENDS.size());
+//		
+//		ProfileQueryEngine pqe = new ProfileQueryEngine("1110316640");
+//		List<Post> posts = pqe.fetchNextPosts();
+//		for (Post post : posts) {
+//			System.out.println(FacebookUtil.toGraphData(post) + "\n\n");
+//		}
 		ProfileQueryEngine pqe = new ProfileQueryEngine("1110316640");
-		List<Post> posts = pqe.fetchNextPosts();
-		for (Post post : posts) {
-			System.out.println(FacebookUtil.toGraphData(post) + "\n\n");
-		}
+		pqe.fetchFavorites();
 	}
 	
-	ProfileQueryEngine(String profileID) {
+	public ProfileQueryEngine(String profileID) {
 		this.profileID = profileID;
 		try {
 			user = FB.fetchObject(profileID,User.class);
@@ -73,7 +75,7 @@ public class ProfileQueryEngine {
 		}
 	}
 	
-	public static void fetchFriendData() {
+	public static void loadFriendData() {
 		User me = FB.fetchObject("me", User.class);
 		ProfileQueryEngine.CURRENT_USER = new Entry<String,String>(me.getId(),me.getName());
 		Connection<User> myFriends = FB.fetchConnection("me/friends", User.class);
@@ -93,12 +95,24 @@ public class ProfileQueryEngine {
 		return null;
 	}
 	
-	public static BufferedImage fetchPicture(String profileID) {
+	public void fetchFavorites() {
+		for (String category : FAVORITES_CATEGORIES) {
+			Connection<NamedFacebookType> itemConn = FB.fetchConnection(
+					profileID + "/" + category,NamedFacebookType.class);
+			for (List<NamedFacebookType> itemList : itemConn) {
+				for (NamedFacebookType item : itemList) {
+					System.out.println(category + ": " + item.getName() + " (" + item.getId() + ")");
+				}
+			}
+		}
+	}
+	
+	public static BufferedImage fetchPicture(String id) {
 		
 		try {
-			URL imgURL = new URL("https://graph.facebook.com/" + profileID + "/picture");
+			URL imgURL = new URL("https://graph.facebook.com/" + id + "/picture");
 			try {
-				if (profileID.equals(CURRENT_USER.key())) {
+				if (id.equals(CURRENT_USER.key())) {
 					Image img = ImageIO.read(imgURL);
 					img = img.getScaledInstance((int)(1.5*img.getWidth(null)), (int)(1.5*img.getHeight(null)),Image.SCALE_SMOOTH);
 			        BufferedImage imageBuff = new BufferedImage(img.getWidth(null),img.getHeight(null), BufferedImage.TYPE_INT_RGB);

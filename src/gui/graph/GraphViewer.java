@@ -5,6 +5,7 @@ import gui.graph.GraphData.IEdgeData;
 import gui.graph.GraphData.IVertexData;
 import gui.graph.physics.IPhysicsController;
 import gui.graph.util.IDCounter;
+import gui.graph.util.Message;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -24,11 +25,9 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.BorderFactory;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.border.BevelBorder;
 
 import model.graph.Edge;
 import model.graph.Graph;
@@ -48,9 +47,9 @@ public class GraphViewer extends JPanel {
     
     protected static final boolean RUN_PHYSICS = true;
     
-    protected static final int DEFAULT_WIDTH = (int)(Toolkit.getDefaultToolkit().getScreenSize().width);
-    protected static final int DEFAULT_HEIGHT = (int)(Toolkit.getDefaultToolkit().getScreenSize().height);
-    protected static final int SCREEN_SIZE_MULT = 4;
+    public static final int DEFAULT_WIDTH = (int)(Toolkit.getDefaultToolkit().getScreenSize().width);
+    public static final int DEFAULT_HEIGHT = (int)(Toolkit.getDefaultToolkit().getScreenSize().height);
+    public static final int SCREEN_SIZE_MULT = 4;
     
     protected int popupX,popupY;
     
@@ -73,8 +72,8 @@ public class GraphViewer extends JPanel {
     protected Map<String,VertexPainter> vertexPainterMap;
     protected Map<String,EdgePainter> edgePainterMap;
     protected DLinkedList<VertexPainter> vertexList;
-    private AbstractPainter currentlyFocused;
-	private AbstractPainter currentlySelected;
+    protected AbstractPainter currentlyFocused;
+	protected AbstractPainter currentlySelected;
 	protected AbstractPainter currentlyDragged;
     protected DLinkedList<EdgePainter> edgeList;
     
@@ -106,14 +105,11 @@ public class GraphViewer extends JPanel {
         this.bounds = new Rectangle(-DEFAULT_WIDTH*SCREEN_SIZE_MULT,
                 -DEFAULT_HEIGHT*SCREEN_SIZE_MULT,2*DEFAULT_WIDTH*SCREEN_SIZE_MULT,
                 2*DEFAULT_HEIGHT*SCREEN_SIZE_MULT);
-        vertexTable = new CoordinateTable2D(bounds);
+        vertexTable = new CoordinateTable2D<VertexPainter>(bounds);
         vertexList = new DLinkedList<VertexPainter>();
         vertexPainterMap = new HashMap<String,VertexPainter>();
         edgePainterMap = new HashMap<String,EdgePainter>();
         edgeList = new DLinkedList<EdgePainter>();
-        this.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createBevelBorder(BevelBorder.RAISED),
-                BorderFactory.createBevelBorder(BevelBorder.LOWERED)));
         popupX = 0;
         popupY = 0;
         halfWidth = controller.root.getX() + controller.root.getWidth()/2;
@@ -122,6 +118,7 @@ public class GraphViewer extends JPanel {
         curX = halfWidth;
         curY = halfHeight;
         createContextMenu();
+        setBackground(Color.WHITE);
     }
     
     protected void createContextMenu() {
@@ -149,8 +146,6 @@ public class GraphViewer extends JPanel {
                 addVertex("#" + IDCounter.next(),popupX,popupY);
             }
         });
-        
-        this.setBackground(Color.WHITE);
         VERTEX_MENUITEMS[0].addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -171,6 +166,11 @@ public class GraphViewer extends JPanel {
         });
     }
     
+    @Override
+    public Rectangle bounds() {
+		return bounds;
+    }
+    
     public void updateMidpoint() {
         halfWidth = controller.root.getX() + controller.root.getWidth()/2;
         halfHeight = controller.root.getY() + controller.root.getHeight()/2;
@@ -181,6 +181,13 @@ public class GraphViewer extends JPanel {
         initiateAnimation();
     }
     
+    public boolean isDraggingView() {
+    	return draggingView;
+    }
+    
+    public void setDraggingView(boolean b) {
+    	this.draggingView = b;
+    }
     
     public void setCurPosition(int x, int y) {
     	curX = x;
@@ -205,13 +212,13 @@ public class GraphViewer extends JPanel {
     }
 
     
-    private void initiateAnimation() {
-        Animator.animate(this);
+    protected void initiateAnimation() {
+    	new Thread(new Animator()).start();
     }
     
-    private void initiatePhysics() {
+    protected void initiatePhysics() {
         if (RUN_PHYSICS) {
-            GraphPhysicsSimulator.runPhysics(this);
+        	new Thread(new GraphPhysicsSimulator()).start();
         }
     }
     
@@ -251,15 +258,6 @@ public class GraphViewer extends JPanel {
     
     public Graph getGraph() {
     	return graph;
-    }
-    
-    public void refreshVertexTable() {
-        vertexTable = new CoordinateTable2D(new Rectangle(
-                -DEFAULT_WIDTH*SCREEN_SIZE_MULT,-DEFAULT_HEIGHT*SCREEN_SIZE_MULT,
-                2*DEFAULT_WIDTH*SCREEN_SIZE_MULT,2*DEFAULT_HEIGHT*SCREEN_SIZE_MULT));
-        for (VertexPainter vp : vertexList) {
-            vertexTable.insert(new Point(vp.x,vp.y),vp);
-        }
     }
     
     public void addGraphData(GraphData<? extends IVertexData,? extends IEdgeData> data) {
@@ -352,10 +350,7 @@ public class GraphViewer extends JPanel {
     }
     
     public void removeVertex(VertexPainter vp) {
-        if (graph.removeVertex(vp.id) != null) {
-            vp.remove();
-            vertexPainterMap.remove(vp.id);
-        }
+        removeVertex(vp.id);
     }
     
     public void removeVertex(String id) {
@@ -525,116 +520,112 @@ public class GraphViewer extends JPanel {
 	public void setCurrentlyFocused(AbstractPainter currentlyFocused) {
 		this.currentlyFocused = currentlyFocused;
 	}
-}
-
-class GraphPhysicsSimulator implements IPhysicsController {
-    
-    static final int CYCLES_PER_SECOND = 100;
-    static final int DEFAULT_FRAME_TIME_MS = 1000/CYCLES_PER_SECOND;
-    
-    GraphViewer g;
-    
-    private GraphPhysicsSimulator(GraphViewer g){
-        this.g = g;   
-    }
-    
-    @Override
-    public void run() {
-        while(true) {
-            int ELAPSED_MS = (int)(runPhysicsCycle()/1000000.0);
-            // System.out.println("Physics: " + ELAPSED_MS + " ms");
-            if (ELAPSED_MS < DEFAULT_FRAME_TIME_MS) {
-                try{
-                    Thread.sleep(DEFAULT_FRAME_TIME_MS - ELAPSED_MS);
-                }catch(Exception e){
-                    e.printStackTrace();
-                    System.exit(1);
-                }
-            }
-        }
-    }
-    
-    static void runPhysics(GraphViewer g) {
-        new Thread(new GraphPhysicsSimulator(g)).start();
-    }
-    
-    /**
-     * Calculates inverse-square repulsive force between two vertices.
-     */
-    private Vector2D repulsiveForce(VertexPainter vp1, VertexPainter vp2) {
-        float squareDist = (float)(Math.pow(vp2.x-vp1.x,2)+Math.pow(vp2.y-vp1.y,2));
-        return new Vector2D((vp2.x-vp1.x)/squareDist,(vp2.y-vp1.y)/squareDist,
-            Vector2D.CARTESIAN,Vector2D.FORCE).scaleTo(g.controller.repulsiveConstant);
-    }
-    
-    private Vector2D autoDragForce() {
-    	int xDiff = g.curX - g.halfWidth;
-		int yDiff = g.curY - g.halfHeight;
-		if (xDiff*xDiff + yDiff*yDiff > 62500 ) {
-			return new Vector2D(xDiff>>7,yDiff>>7,Vector2D.CARTESIAN,Vector2D.FORCE);
-		} else {
-			return null;
-		}
-    }
-    
-    @Override
-    public long runPhysicsCycle() {
-        long start = System.nanoTime();
-        //System.out.println("Running physics cycle:");
-        for(EdgePainter spring : g.edgeList) {
-            spring.update();
-            //System.out.println("  Checking " + spring);
-            Vector2D force = spring.force();
-            //System.out.println("    Total force: " + force);
-            spring.vp1.updateAcceleration(force);
-            spring.vp2.updateAcceleration(force.scaleTo(-1));
-        }
-        for(VertexPainter m1 : g.vertexList) {
-            for(VertexPainter m2 : g.vertexList) {
-                if (m1 != m2) {
-                    m1.acceleration.add(repulsiveForce(m1,m2).
-                            scaleTo(-1/m1.mass()));
-                    if (g.hasFocus() && !g.draggingView) {
-	                    Vector2D dragForce = autoDragForce();
-	                    if (dragForce != null) {
-	                    	m1.acceleration.add(dragForce.scaleTo(-1/m1.mass()));
+	
+	public class GraphPhysicsSimulator implements IPhysicsController {
+	    
+	    protected static final int CYCLES_PER_SECOND = 100;
+	    protected static final int DEFAULT_FRAME_TIME_MS = 1000/CYCLES_PER_SECOND;
+	    
+	    @Override
+	    public void run() {
+	        while(true) {
+	            int ELAPSED_MS = (int)(runPhysicsCycle()/1000000.0);
+	            // System.out.println("Physics: " + ELAPSED_MS + " ms");
+	            if (ELAPSED_MS < DEFAULT_FRAME_TIME_MS) {
+	                try{
+	                    Thread.sleep(DEFAULT_FRAME_TIME_MS - ELAPSED_MS);
+	                }catch(Exception e){
+	                    e.printStackTrace();
+	                    System.exit(1);
+	                }
+	            }
+	        }
+	    }
+	    
+	    /**
+	     * Calculates inverse-square repulsive force between two vertices.
+	     */
+	    protected Vector2D repulsiveForce(VertexPainter vp1, VertexPainter vp2) {
+	        float squareDist = (float)(Math.pow(vp2.x-vp1.x,2)+Math.pow(vp2.y-vp1.y,2));
+	        return new Vector2D((vp2.x-vp1.x)/squareDist,(vp2.y-vp1.y)/squareDist,
+	            Vector2D.CARTESIAN,Vector2D.FORCE).scaleTo(controller.repulsiveConstant);
+	    }
+	    
+	    protected Vector2D autoDragForce() {
+	    	int xDiff = curX - halfWidth;
+			int yDiff = curY - halfHeight;
+			if (xDiff*xDiff + yDiff*yDiff > 122500 ) {
+				return new Vector2D(xDiff>>7,yDiff>>7,Vector2D.CARTESIAN,Vector2D.FORCE);
+			} else {
+				return null;
+			}
+	    }
+	    
+	    protected void updateEdges() {
+			for (EdgePainter ep : edgePainterMap.values()) {
+				ep.inform(Message.REQUEST_UPDATE, null);
+			}
+	    }
+	    
+	    protected void calcAllSpringForces() {
+	        for(EdgePainter spring : edgeList) {
+	            spring.update();
+	            //System.out.println("  Checking " + spring);
+	            Vector2D force = spring.force();
+	            //System.out.println("    Total force: " + force);
+	            spring.vp1.updateAcceleration(force);
+	            spring.vp2.updateAcceleration(force.scaleTo(-1));
+	        }
+	    }
+	    
+	    protected void calcAllRepulsiveForces() {
+	        for(VertexPainter m1 : vertexList) {
+	            for(VertexPainter m2 : vertexList) {
+	                if (m1 != m2) {
+	                    m1.acceleration.add(repulsiveForce(m1,m2).
+	                            scaleTo(-1/m1.mass()));
+	                    if (hasFocus() && !draggingView && currentlyDragged == null) {
+		                    Vector2D dragForce = autoDragForce();
+		                    if (dragForce != null) {
+		                    	m1.acceleration.add(dragForce.scaleTo(-1/m1.mass()));
+		                    }
 	                    }
-                    }
-                }
-            }
-            m1.calc(DEFAULT_TIMESTEP_MS);
-        }
-        return System.nanoTime() - start;
-    }
-    
+	                    
+	                }
+	            }
+	            m1.calc(DEFAULT_TIMESTEP_MS);
+	        }
+	    }
+	    
+	    @Override
+	    public long runPhysicsCycle() {
+	        long start = System.nanoTime();
+	        //System.out.println("Running physics cycle:");
+	        calcAllSpringForces();
+	        calcAllRepulsiveForces();
+	        // updateEdges();
+	        return System.nanoTime() - start;
+	    }
+	}
+	
+
+	public class Animator implements Runnable{
+	    
+	    @Override
+	    public void run() {
+	        Graphics2D g2d = (Graphics2D)getGraphics();
+	        while(true) {
+	            repaint();
+	            try {
+	                Thread.sleep(5);
+	            } catch (InterruptedException e) {
+	            }
+	            // System.out.println("Animation: " + (System.nanoTime() - start)/1000000.0);
+	        }
+	    }
+	}
 }
 
-class Animator implements Runnable{
-
-    GraphViewer g;
-    
-    private Animator(GraphViewer g){
-        this.g = g;   
-    }
-    
-    static void animate(GraphViewer g) {
-        new Thread(new Animator(g)).start();
-    }
-    
-    @Override
-    public void run() {
-        Graphics2D g2d = (Graphics2D)g.getGraphics();
-        while(true) {
-        	long start = System.nanoTime();
-            g.repaint();
-            try {
-                Thread.sleep(5);
-            } catch (InterruptedException e) {
-            }
-            // System.out.println("Animation: " + (System.nanoTime() - start)/1000000.0);
-        }
-    }
-}
 
 
 

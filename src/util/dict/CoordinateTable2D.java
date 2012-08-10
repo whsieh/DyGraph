@@ -1,5 +1,6 @@
 package util.dict;
 
+import gui.graph.AbstractPainter;
 import gui.graph.IMouseContainer;
 
 import java.awt.Color;
@@ -76,125 +77,68 @@ public class CoordinateTable2D<V> {
                         }
                     }
                 }
-            }      
+            }
         }
         return neighbors;
     }
 
     public V insert(Point key, V value) {
-        try{
-            Point region = findRegion(key);
-            if (buckets[region.x][region.y] == null) {
-                buckets[region.x][region.y] = 
-                        new CopyOnWriteArrayList <V>();
-            }
-            buckets[region.x][region.y].add(value);
-            size++;
-            return value;
-        }catch(IndexOutOfBoundsException e) {
-            //System.err.println("You have clipped through the edge of the"
-            //        + " graph panel. Java will pretend it saw nothing :)");
-            return null;
-        }
+        return insert(key.x, key.y, value);
     }
     
     public V insert(int x, int y, V value) {
-        try{
-            Point region = findRegion(x,y);
-            if (buckets[region.x][region.y] == null) {
-                buckets[region.x][region.y] = 
-                        new CopyOnWriteArrayList <V>();
-            }
-            buckets[region.x][region.y].add(value);
-            size++;
-            return value;
-        }catch(IndexOutOfBoundsException e) {
-            // System.err.println("You have clipped through the edge of the"
-            // 		+ " graph panel. Java will pretend it saw nothing :)");
-            return null;
+        Point region = findRegion(x,y);
+        int xReg = region.x, yReg = region.y;
+        if (0 <= xReg && xReg < DIM && 0 <= yReg && yReg < DIM) {
+	        if (buckets[xReg][yReg] == null) {
+	            buckets[xReg][yReg] = 
+	                    new CopyOnWriteArrayList <V>();
+	        }
+	        buckets[xReg][yReg].add(value);
+	        size++;
+	        return value;
         }
+        return null;
     }
 
     public V find(Point key) {
-        try{
-            Point region = findRegion(key);
-            if (buckets[region.x][region.y] == null) {
-                return null;
-            }
-            for (V e : buckets[region.x][region.y]) {
-                if (((IMouseContainer)(e)).contains(key)) {
-                    return e;
-                }
-            }
-            return null;
-        }catch(IndexOutOfBoundsException e) {
-            System.err.println("You have clipped through the edge of the"
-                    + " graph panel. Java will pretend it saw nothing :)");
-            return null;
+        Point region = findRegion(key);
+        int x = region.x, y = region.y;
+        if (0 <= x && x < DIM && 0 <= y && y < DIM) {
+	        if (buckets[x][y] == null) {
+	            return null;
+	        }
+	        for (V e : buckets[x][y]) {
+	            if (((IMouseContainer)(e)).contains(key)) {
+	                return e;
+	            }
+	        }
         }
+        return null;
     }
     
     public V remove(Point key, V v) {
-        try{
-            Point region = findRegion(key);
-            if (buckets[region.x][region.y] == null) {
-                return null;
-            }
-            for (V e : buckets[region.x][region.y]) {
-                if (((IMouseContainer)(e)).contains(key) && v == e) {
-                    buckets[region.x][region.y].remove(e);
-                    size--;
-                    return e;
-                }
-            }
-            return null;
-        }catch(IndexOutOfBoundsException e) {
-            System.err.println("You have clipped through the edge of the"
-                    + " graph panel. Java will pretend it saw nothing :)");
-            return null;
-        }
+        return remove(key.x, key.y, v);
     }
     
     public V remove(int x, int y, V v) {
-        try{
-            Point region = findRegion(x,y);
-            if (buckets[region.x][region.y] == null) {
-                return null;
-            }
-            for (V e : buckets[region.x][region.y]) {
-                if (((IMouseContainer)(e)).contains(x,y) && v == e) {
-                    buckets[region.x][region.y].remove(e);
-                    size--;
-                    return e;
-                }
-            }
-            return null;
-        }catch(IndexOutOfBoundsException e) {
-            System.err.println("You have clipped through the edge of the"
-                    + " graph panel. Java will pretend it saw nothing :)");
-            return null;
+        Point region = findRegion(x,y);
+        int xReg = region.x, yReg = region.y;
+        if (0 <= xReg && xReg < DIM && 0 <= yReg && yReg < DIM) {
+	        if (buckets[xReg][yReg] == null) {
+	            return null;
+	        }
+	        for (V e : buckets[xReg][yReg]) {
+	            if (((IMouseContainer)(e)).contains(x,y) && v == e) {
+	                buckets[xReg][yReg].remove(e);
+	                size--;
+	                return e;
+	            }
+	        }
+        } else {
+        	System.err.println("Vertex out of bounds: " + v);
         }
-    }
-
-    public V remove(Point key) {
-        try {
-            Point region = findRegion(key);
-            if (buckets[region.x][region.y] == null) {
-                return null;
-            }
-            for (V e : buckets[region.x][region.y]) {
-                if (((IMouseContainer)(e)).contains(key)) {
-                    buckets[region.x][region.y].remove(e);
-                    size--;
-                    return e;
-                }
-            }
-            return null;
-        } catch (IndexOutOfBoundsException e) {
-            System.err.println("You have clipped through the edge of the"
-                    + " graph panel. Java will pretend it saw nothing :)");
-            return null;
-        }
+        return null;
     }
     
     public void paint(Graphics g) {

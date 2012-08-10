@@ -36,8 +36,9 @@ public abstract class GraphItem implements Named{
     /**
      * Adds the given data to the graph component under the given key.
      */
-    public void setData(String key, Object value){
+    public Object setData(String key, Object value){
         info.put(key, value);
+        return value;
     }
     
     /**
