@@ -45,6 +45,7 @@ import stat.comm.Dendrogram;
 
 public class DygraphConsole extends JFrame {
 
+	private static final long serialVersionUID = 1L;
 	private final static String LOG_STRING = "$>";
 	private final static String ERR_STRING = "ERR>";
 	
@@ -69,7 +70,7 @@ public class DygraphConsole extends JFrame {
 	private int historyIndex;
 	private int posX=0,posY=0;
 	
-	private GraphController controller;	
+	private GraphController<DygraphViewer> controller;	
 	
 	/**
 	 * Create the frame.
@@ -98,7 +99,7 @@ public class DygraphConsole extends JFrame {
 		}
 	}
 	
-	public void setController(GraphController controller) {
+	public void setController(GraphController<DygraphViewer> controller) {
 		this.controller = controller;
 	}
 
@@ -182,33 +183,27 @@ public class DygraphConsole extends JFrame {
 	
 	private void parse(String command) {
 		String[] in = command.split(" ");
+		String root = in[0];
 		if (in.length > 0 && !in[0].equals("")) {
-		switch(in[0]) {
-			case "threshold":
+			if (root.equals("threshold")) {
 				threshold(in);
-				break;
-			case "stat":
+			} else if (root.equals("stat")) {
 				stat(in);
-				break;
-			case "cls":
+			} else if (root.equals("cls")) {
 				output.setText("");
-				break;
-			case "close":
+			} else if (root.equals("close")) {
 				dispose();
-				break;
-			case "exit":
+			} else if (root.equals("exit")) {
 				System.exit(0);
-			case "who":
+			} else if (root.equals("who")) {
 				for (int i = 1; i < in.length; i++) {
 					String id = in[i].replaceAll(",","");
 					DygraphViewer fgv = (DygraphViewer)controller.getView();
 					log("Looking up id #" + id + ": " + fgv.whois(id));
 				}
-				break;
-			default:
+			} else {
 				err("Unrecognized command: " + command);
-				break;
-		}
+			}
 		} else {
 			log("");
 		}

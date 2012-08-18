@@ -1,14 +1,14 @@
 package gui.virtual;
 
-import gui.virtual.ColorScheme.ColorSchemeData;
 import gui.virtual.Identifiers.POS;
-import gui.virtual.Identifiers.STATE;
 
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 
 public class VirtualPanel extends VirtualComponent {
+	
+	private static final long serialVersionUID = 1L;
 	
 	public final static ColorScheme DEFAULT_COLOR_SCHEME = new ColorScheme(
 			new Color(0,0,0,0));
@@ -33,6 +33,9 @@ public class VirtualPanel extends VirtualComponent {
 	@Override
 	public void paintComponent(Graphics g) {
 		paintBackground((Graphics2D)g);
+	}
+
+	public void finish() {		
 	}
 
 }

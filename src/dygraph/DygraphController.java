@@ -84,8 +84,8 @@ public class DygraphController extends GraphController<DygraphViewer> {
     			dView.currentlyGhosted = null;
     		} else {
     			mode = Mode.COMPARE;
-    			dView.openFavoritesPanel(dView.currentlyGhosted.getDisplayName(),
-    					((FacebookVertexPainter)vp).getDisplayName());
+    			dView.openFavoritesPanel(dView.currentlyGhosted.pqe,
+    					((FacebookVertexPainter)vp).pqe);
     			dView.fadeOutViewerBackground();
     			dView.currentlyGhosted = null;
     		}
@@ -107,9 +107,9 @@ public class DygraphController extends GraphController<DygraphViewer> {
     
     @Override
     public void handleMousePressed(MouseEvent e) {
-	    if (mode == Mode.COMPARE && dView.favoritesFrame != null) {
-	    	Point p = dView.favoritesFrame.getLocation();
-    		if (!dView.favoritesFrame.contains(e.getX()-p.x,e.getY()-p.y)) {
+	    if (mode == Mode.COMPARE && dView.compareFrame != null) {
+	    	Point p = dView.compareFrame.getLocation();
+    		if (!dView.compareFrame.contains(e.getX()-p.x,e.getY()-p.y)) {
     			mode = Mode.DEFAULT;
     			dView.closeFavoritesPanel();
     			dView.fadeInViewerBackground();

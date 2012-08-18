@@ -46,17 +46,16 @@ public class DygraphViewer extends GraphViewer {
 	private final static AlphaComposite ALPHA_COMP = 
 			AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f);
 	
-	protected Map<String,ProfileQueryEngine> profileSet;
+	protected Map<String,ProfileQueryEngine> profiles;
 	protected DygraphController dController;
 	
-	// this goes down as one of the worst variable names ever -.-
 	protected FacebookVertexPainter currentlyGhosted;
 	
-	protected CompareFrame favoritesFrame;
+	protected CompareFrame compareFrame;
 	
 	public DygraphViewer(DygraphController controller) {
 		super(controller);
-		profileSet = new HashMap<String,ProfileQueryEngine>();
+		profiles = new HashMap<String,ProfileQueryEngine>();
 		dController = (DygraphController)controller;
 	}
 	
@@ -79,7 +78,7 @@ public class DygraphViewer extends GraphViewer {
 		}
 		g2d.setStroke(GHOST_PROFILE_STROKE);
 		// int halfWidth = currentlyGhosted.width/2,halfHeight = currentlyGhosted.height/2;
-		g2d.drawImage(currentlyGhosted.image, curX-currentlyGhosted.width, curY-currentlyGhosted.height, this);
+		g2d.drawImage(currentlyGhosted.displayPic, curX-currentlyGhosted.width, curY-currentlyGhosted.height, this);
 		g2d.drawRoundRect(curX-currentlyGhosted.width, curY-currentlyGhosted.height, currentlyGhosted.width, currentlyGhosted.height,5,5);
 		g2d.setComposite(c);
 		g2d.setStroke(s);
@@ -149,16 +148,18 @@ public class DygraphViewer extends GraphViewer {
 		}).start();
 	}
 	
-	protected void openFavoritesPanel(final String name1, final String name2) {
+	protected void openFavoritesPanel(final ProfileQueryEngine prof1, final ProfileQueryEngine prof2) {
 		new Thread(new Runnable() {
 			private int width = 100,height = 60;
 			@Override
 			public void run() {
-				favoritesFrame = new CompareFrame(
+				compareFrame = new CompareFrame(prof1,prof2,
 						halfWidth-width/2,halfHeight-height/2,width,height);
-				add(favoritesFrame);
-				favoritesFrame.setTitle(name1 + " and " + name2);
-				favoritesFrame.expand(1200+width,1200+height);
+				add(compareFrame);
+				compareFrame.setTitle(prof1.user.getName() + " and " + prof2.user.getName());
+				System.out.println("halfWidth: " + halfWidth);
+				System.out.println("halfHeight: " + halfHeight);
+				compareFrame.expand((int)(halfHeight*2)+width,(int)(halfHeight*2)+height);
 			}
 		}).start();
 	}
@@ -169,9 +170,10 @@ public class DygraphViewer extends GraphViewer {
 			@Override
 			public void run() {
 				/* Run closing animation here... */
-				favoritesFrame.setVisible(false);
-				remove(favoritesFrame);
-				favoritesFrame = null;
+				compareFrame.finish();
+				compareFrame.setVisible(false);
+				remove(compareFrame);
+				compareFrame = null;
 			}
 		}).start();
 	}
@@ -185,10 +187,10 @@ public class DygraphViewer extends GraphViewer {
 	}
 	
 	public ProfileQueryEngine getProfile(String id) {
-		ProfileQueryEngine profile = profileSet.get(id);
+		ProfileQueryEngine profile = profiles.get(id);
 		if (profile == null) {
 			profile = new ProfileQueryEngine(id);
-			profileSet.put(id,profile);
+			profiles.put(id,profile);
 		}
 		return profile;
 	}
@@ -287,7 +289,7 @@ public class DygraphViewer extends GraphViewer {
 	
 	@Override
 	protected VertexPainter createVertexPainter(int x, int y, String id, String displayName) {
-		return new FacebookVertexPainter(this,x,y,id,displayName);
+		return new FacebookVertexPainter(this,x,y,id,displayName, getProfile(id));
 	}
 	
 	public void expandProfileConnections(final String id) {

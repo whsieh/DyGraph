@@ -1,15 +1,38 @@
 package dygraph;
 
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import util.misc.XMLUtil;
+
 import com.restfb.types.NamedFacebookType;
 import com.restfb.types.Post;
+import com.restfb.types.StatusMessage;
 import com.restfb.types.User;
+
+import dygraph.compare.KeywordData;
 
 final public class FacebookUtil {
 
+	final static public String API_KEY = "[REDACTED]";
+	final static public String ENDPOINT = "http://access.alchemyapi.com/calls/text/TextGetRankedKeywords";
+	final static public String PARAMS = "?apikey=" + API_KEY + "&keywordExtractMode=strict&text=";
+	
 	private FacebookUtil(){}
 	
 	public static FacebookGraphData toGraphData(Post post) {
@@ -83,7 +106,73 @@ final public class FacebookUtil {
 			}
 		}
 		return data;
+	}
+	
+	public static KeywordData[] toKeywordData(StatusMessage[] statuses) {
 		
+		List<KeywordData> keywordDataList = new LinkedList<KeywordData>();
+		StringBuilder dataBuilder = new StringBuilder();
+		String myText = extractText(statuses);
+		String queryURI = ENDPOINT + PARAMS + myText;
+		URL url;
+		InputStream is = null;
+		DataInputStream dis;
+		int intChar;
+		try {
+		    url = new URL(queryURI);
+		    is = url.openStream();  // throws an IOException
+		    dis = new DataInputStream(new BufferedInputStream(is));
+		    while ((intChar = dis.read()) != -1) {
+		        dataBuilder.append(((char)intChar));
+		    }
+		} catch (MalformedURLException mue) {
+		     mue.printStackTrace();
+		} catch (IOException ioe) {
+		     ioe.printStackTrace();
+		} finally {
+		    try {
+		        is.close();
+		    } catch (IOException ioe) {
+		    }
+		}
+		
+		String xmlString = dataBuilder.toString();
+		Document doc = XMLUtil.loadXML(xmlString);
+		doc.getDocumentElement().normalize();
+		Element results = doc.getDocumentElement();
+		NodeList keywords = results.getElementsByTagName("keyword");
+		for (int i = 0; i < keywords.getLength(); i++) {
+			Node keywordNode = keywords.item(i);
+			if (keywordNode.getNodeType() == Node.ELEMENT_NODE) {
+				Element keywordElement = (Element) keywordNode;
+				keywordDataList.add(new KeywordData(
+						XMLUtil.getTagValue("text", keywordElement),statuses));
+			}
+		}
+		return keywordDataList.toArray(new KeywordData[keywordDataList.size()]);
+	}
+	
+	private static String extractText(StatusMessage[] statuses) {
+		
+		final String divider = " ;";
+		StringBuilder statusText = new StringBuilder();
+		
+		/* We need to change this. I don't know any way to find tagged users in
+		 * statuses, so this will have to do for now. */
+		for (StatusMessage status : statuses) {
+			String text = status.getMessage();
+			for (String friend : ProfileQueryEngine.MY_FRIENDS.values()) {
+				text = text.replaceFirst(friend, "");
+			}
+			statusText.append(text + divider);
+		}
+		String text = statusText.toString();
+		try {
+			return URLEncoder.encode(text,"UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+			return text;
+		}
 	}
 	
 }

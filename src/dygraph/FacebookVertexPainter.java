@@ -16,10 +16,10 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
-import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
+import util.misc.ImageUtil;
 import dygraph.DygraphController.Mode;
 
 public class FacebookVertexPainter extends VertexPainter{
@@ -27,23 +27,30 @@ public class FacebookVertexPainter extends VertexPainter{
 	private final static AlphaComposite ALPHA_COMP = 
 			AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.25f);
 	
-    protected BufferedImage image;
+    protected BufferedImage displayPic;
     protected int width;
     protected int height;
-    
+    protected ProfileQueryEngine pqe;
     protected DygraphViewer dView;
     
     protected volatile boolean isLoading;
 
-	public FacebookVertexPainter(GraphViewer graphPane, int xPos, int yPos, String id) {
-		this(graphPane, xPos, yPos, id, id);
+	public FacebookVertexPainter(GraphViewer graphPane, int xPos, int yPos, String id, ProfileQueryEngine pqe) {
+		this(graphPane, xPos, yPos, id, id, pqe);
 	}
 	
-    public FacebookVertexPainter(GraphViewer graphPane, int xPos, int yPos, String id, String displayName) {
+    public FacebookVertexPainter(GraphViewer graphPane, int xPos, int yPos, String id, String displayName, ProfileQueryEngine pqe) {
         super(graphPane, xPos, yPos, id, displayName);
-        image = ProfileQueryEngine.fetchPicture(id);
-        this.width = image.getWidth();
-        this.height = image.getHeight();
+        this.pqe = pqe;
+        if (id.equals(ProfileQueryEngine.CURRENT_USER.key())) {
+        	pqe.fetchPicture();
+        	displayPic = ImageUtil.scalePicture(pqe.image);
+        	
+        } else {
+        	displayPic = pqe.fetchPicture();
+        }
+        this.width = displayPic.getWidth();
+        this.height = displayPic.getHeight();
 		if (graphPane instanceof DygraphViewer) {
 			dView = (DygraphViewer)graphPane;
 		}
@@ -84,7 +91,7 @@ public class FacebookVertexPainter extends VertexPainter{
 	public void remove() {
 		super.remove();
 		if (dView != null) {
-			dView.profileSet.remove(id);
+			dView.profiles.remove(id);
 		}
 	}
     
@@ -149,11 +156,11 @@ public class FacebookVertexPainter extends VertexPainter{
         	g2d.fillOval(x - 8, y - 8, 16, 16);
         	g2d.setComposite(ALPHA_COMP);
             g2d.drawRoundRect(x - 2 - halfWidth, y - 2 - halfHeight, width+2, height+2,5,5);
-            g2d.drawImage(image, x - halfWidth, y - halfHeight,	myParent);
+            g2d.drawImage(displayPic, x - halfWidth, y - halfHeight,	myParent);
             g2d.setComposite(composite);
         } else {
 	        g2d.drawRoundRect(x - 2 - halfWidth, y - 2 - halfHeight, width+2, height+2,5,5);
-	        g2d.drawImage(image, x - halfWidth, y - halfHeight,	myParent);
+	        g2d.drawImage(displayPic, x - halfWidth, y - halfHeight,	myParent);
         }
         
         if (isLoading) {

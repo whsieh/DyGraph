@@ -1,6 +1,6 @@
 package util.misc;
 
-import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -12,11 +12,15 @@ import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
 import java.awt.Image;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
+import java.awt.image.FilteredImageSource;
+import java.awt.image.ImageFilter;
+import java.awt.image.ImageProducer;
 import java.awt.image.PixelGrabber;
-import java.awt.image.RescaleOp;
+import java.awt.image.RGBImageFilter;
 import java.awt.image.WritableRaster;
 
 import javax.swing.ImageIcon;
@@ -25,6 +29,32 @@ import javax.swing.JComponent;
 final public class ImageUtil {
 
 	private ImageUtil(){}
+	
+	public static BufferedImage scalePicture(Image img) {
+		img = img.getScaledInstance((int)(1.5*img.getWidth(null)), (int)(1.5*img.getHeight(null)),Image.SCALE_SMOOTH);
+        BufferedImage imageBuff = new BufferedImage(img.getWidth(null),img.getHeight(null), BufferedImage.TYPE_INT_RGB);
+        Graphics g = imageBuff.createGraphics();
+        g.drawImage(img, 0, 0, new Color(0,0,0), null);
+        g.dispose();
+        return imageBuff;
+	}
+	
+    static public Image transformToTransparency(BufferedImage image) {
+        return transformToTransparency(image,Color.WHITE);
+    }
+    
+    static public Image transformToTransparency(BufferedImage image,final Color color) {
+        ImageFilter filter = new RGBImageFilter(){
+            @Override
+            public final int filterRGB(int x, int y, int rgb){
+                if(rgb >= color.getRGB())
+                    return 0x00FFFFFF & rgb;
+                return rgb;
+            }
+        };
+        ImageProducer ip = new FilteredImageSource(image.getSource(), filter);
+        return Toolkit.getDefaultToolkit().createImage(ip);
+    }
     
 	public static BufferedImage createImage(JComponent component) {
 		Dimension d = component.getSize();

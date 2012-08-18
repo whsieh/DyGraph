@@ -4,30 +4,39 @@ import gui.virtual.Animator;
 import gui.virtual.VirtualFrame;
 import gui.virtual.VirtualPanel;
 
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Point;
 
+import dygraph.ProfileQueryEngine;
 import dygraph.compare.NavigationPanel.Direction;
+import dygraph.compare.panels.KeywordsPanel;
 
 public class CompareFrame extends VirtualFrame {
 	
-	VirtualPanel previousPanel;
-	VirtualPanel nextPanel;
+	final public static int NAV_BAR_WIDTH = 80;
 	
-	VirtualPanel contentPanel;
+	protected ProfileQueryEngine prof1;
+	protected ProfileQueryEngine prof2;
 	
-	public CompareFrame(int x, int y, int width, int height) {
+	protected VirtualPanel previousPanel;
+	protected VirtualPanel nextPanel;
+	protected VirtualPanel contentPanel;
+	
+	public CompareFrame(ProfileQueryEngine prof1, ProfileQueryEngine prof2,
+			int x, int y, int width, int height) {
 		super(x,y,width,height);
+		this.prof1 = prof1;
+		this.prof2 = prof2;
 	}
 	
 	@Override
 	public void initialize() {
-		previousPanel = new NavigationPanel(0,DEFAULT_BAR_THICKNESS,100,getHeight()-DEFAULT_BAR_THICKNESS,Direction.LEFT);
+		previousPanel = new NavigationPanel(0,DEFAULT_BAR_THICKNESS,
+				NAV_BAR_WIDTH,getHeight()-DEFAULT_BAR_THICKNESS,Direction.LEFT);
 		add(previousPanel);
-		nextPanel = new NavigationPanel(getWidth()-100,DEFAULT_BAR_THICKNESS,100,getHeight()-DEFAULT_BAR_THICKNESS,Direction.RIGHT);
+		nextPanel = new NavigationPanel(getWidth()-NAV_BAR_WIDTH,
+				DEFAULT_BAR_THICKNESS,NAV_BAR_WIDTH,getHeight()-DEFAULT_BAR_THICKNESS,Direction.RIGHT);
 		add(nextPanel);
-		contentPanel = new ComparePanel(this);
+		contentPanel = new KeywordsPanel(this,prof1,prof2);
 		add(contentPanel);
 	}
 	
@@ -45,6 +54,10 @@ public class CompareFrame extends VirtualFrame {
 	
 	public Point getLocation() {
 		return super.getLocation();
+	}
+	
+	public void finish() {
+		contentPanel.finish();
 	}
 	
 	public void expand(final int w, final int h) {

@@ -14,12 +14,14 @@ import com.restfb.DefaultFacebookClient;
 
 final public class DygraphApplet extends JApplet{
     
+	private static final long serialVersionUID = 1L;
 	final static int DEFAULT_WIDTH = 1600;
 	final static int DEFAULT_HEIGHT = 900;
-	final static String DEBUG_TOKEN = "AAACEdEose0cBAKUMjFS7tHTW9ijg7eLno4jX8nDfvNcow815CohMdTPKUXp41gLk3cyGTYMWQCofvb8RWsZAmZBiW3YGfLkZCRmZAbYLUaupuJGZAeZCKJ";
+	final static String DEBUG_TOKEN = "AAACEdEose0cBAH8WmxvZABKMJKXFAaxdpqluuZCVGbeW2IcZBLNEmhPgmIgcBaT9eoaD52QyMwJZB7DtDTvjBu3UL1swMkLZBZAxNycjQkYPsuDWiz7o0i";
 	protected DygraphController c;
 	
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public void init() {
     	try {
     		this.addComponentListener(new ComponentAdapter() {
@@ -47,7 +49,6 @@ final public class DygraphApplet extends JApplet{
     	} catch (Exception e) {
     		System.err.println("An error has occurred. See below for details:");
     		e.printStackTrace();
-    		throw e;
     	}
     }
     

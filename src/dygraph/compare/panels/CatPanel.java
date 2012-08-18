@@ -1,4 +1,4 @@
-package dygraph.compare;
+package dygraph.compare.panels;
 
 import gui.virtual.ColorScheme;
 import gui.virtual.ColorScheme.ColorSchemeData;
@@ -11,10 +11,9 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 import dygraph.DygraphResource;
+import dygraph.compare.CompareFrame;
 
-import util.misc.ImageLibrary;
-
-public class ComparePanel extends VirtualPanel {
+public class CatPanel extends VirtualPanel {
 	
 	public final static ColorScheme DEFAULT_COLOR_SCHEME = new ColorScheme(
 			new Color(150,150,150,0),
@@ -22,14 +21,12 @@ public class ComparePanel extends VirtualPanel {
 			new ColorSchemeData(POS.FOREGROUND, new Color(25,25,25,255)));
 	
 	private VirtualLabel titleLabel;
-	private VirtualLabel descriptionLabel;
 	
-	/* Yes, the cat plugin is only temporary :\ */
 	private VirtualLabel catLabel;
 	private VirtualPanel catPanel;
 	
-	public ComparePanel(CompareFrame frame) {
-		super(100,CompareFrame.DEFAULT_BAR_THICKNESS,frame.getWidth()-200,
+	public CatPanel(CompareFrame frame) {
+		super(CompareFrame.NAV_BAR_WIDTH,CompareFrame.DEFAULT_BAR_THICKNESS,frame.getWidth()-CompareFrame.NAV_BAR_WIDTH*2,
 				frame.getHeight()-CompareFrame.DEFAULT_BAR_THICKNESS,DEFAULT_COLOR_SCHEME);
 		titleLabel = new VirtualLabel(5,5,"This feature under development!","Arial",1,getHeight()/20);
 		add(titleLabel);
