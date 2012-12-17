@@ -17,12 +17,13 @@ public final class DygraphResource {
 	}
 	
 	public static void loadAll() {
-		GREEN_PLUS = ImageUtil.transformToTransparency(ImageLibrary.grabImage("http://dygraph.herobo.com/img/green_plus.png"));
-		CAT_PICTURE = ImageLibrary.grabImage("http://dygraph.herobo.com/img/cat_picture.jpg");
+		GREEN_PLUS = ImageUtil.transformToTransparency(ImageLibrary.grabImage("http://dygraph.netne.net/img/green_plus.png"));
+		CAT_PICTURE = ImageLibrary.grabImage("http://dygraph.netne.net/img/cat_picture.jpg");
 		try {
-			URL loadURL = new URL("http://dygraph.herobo.com/img/loading.gif");
+			URL loadURL = new URL("http://dygraph.netne.net/img/loading.gif");
 			LOADING = new ImageIcon(loadURL);
 		} catch (MalformedURLException e) {
+			System.err.println("Could not load loading.gif :(");
 		}
 	}
 	

@@ -37,6 +37,7 @@ public class CompareFrame extends VirtualFrame {
 				DEFAULT_BAR_THICKNESS,NAV_BAR_WIDTH,getHeight()-DEFAULT_BAR_THICKNESS,Direction.RIGHT);
 		add(nextPanel);
 		contentPanel = new KeywordsPanel(this,prof1,prof2);
+		System.out.println("Content panel: " + contentPanel);
 		add(contentPanel);
 	}
 	

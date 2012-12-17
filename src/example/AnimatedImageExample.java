@@ -8,7 +8,7 @@ public class AnimatedImageExample {
 	
     public static void main(String[] args) throws MalformedURLException {
  
-        URL url = new URL("http://dygraph.herobo.com/img/loading.gif");
+        URL url = new URL("http://dygraph.netne.net/img/loading.gif");
         Icon icon = new ImageIcon(url);
         JLabel label = new JLabel(icon) {
         	@Override

@@ -48,14 +48,17 @@ public class KeywordsPanel extends VirtualPanel {
 		this.prof1 = prof1;
 		this.prof2 = prof2;
         
-		int iconWidth = DygraphResource.LOADING.getIconWidth();
-		int iconHeight= DygraphResource.LOADING.getIconHeight();
-        loading1 = new JLabel(DygraphResource.LOADING);
-        loading2 = new JLabel(DygraphResource.LOADING);
-        loading1.setBounds(getWidth()/4-(iconWidth/2),getHeight()/2-(iconHeight/2),iconWidth,iconHeight);
-        loading2.setBounds(3*getWidth()/4-(iconWidth/2),getHeight()/2-(iconHeight/2),iconWidth,iconHeight);
-        add(loading1);
-        add(loading2);
+		
+		if (DygraphResource.LOADING != null) {
+			int iconWidth = DygraphResource.LOADING.getIconWidth();
+			int iconHeight= DygraphResource.LOADING.getIconHeight();
+	        loading1 = new JLabel(DygraphResource.LOADING);
+	        loading2 = new JLabel(DygraphResource.LOADING);
+	        loading1.setBounds(getWidth()/4-(iconWidth/2),getHeight()/2-(iconHeight/2),iconWidth,iconHeight);
+	        loading2.setBounds(3*getWidth()/4-(iconWidth/2),getHeight()/2-(iconHeight/2),iconWidth,iconHeight);
+	        add(loading1);
+	        add(loading2);
+		}
         
 		initialize();
 	}
@@ -87,8 +90,10 @@ public class KeywordsPanel extends VirtualPanel {
 				}
 				add(textScroll1);
 				textScroll1.initialize();
-				loading1.getGraphics().dispose();
-				remove(loading1);
+				if (loading1 != null) {
+					loading1.getGraphics().dispose();
+					remove(loading1);
+				}
 			}
 		}).start();
 		
@@ -100,9 +105,11 @@ public class KeywordsPanel extends VirtualPanel {
 					textScroll2.addLabel(data.getKeyword(),"Arial",1,25);
 				}
 				add(textScroll2);
-				textScroll2.initialize();	
-				loading2.getGraphics().dispose();
-				remove(loading2);
+				textScroll2.initialize();
+				if (loading2 != null) {
+					loading2.getGraphics().dispose();
+					remove(loading2);
+				}
 			}
 		}).start();		
 	}

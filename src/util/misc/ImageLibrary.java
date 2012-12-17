@@ -29,6 +29,7 @@ public class ImageLibrary {
             } catch (IOException e) {
                 System.err.println("ERROR: image resource not found: "
                         + imageName);
+                System.err.println("Current filepath: " + new File("").getAbsolutePath());
                 System.exit(1);
             }
         } else {
