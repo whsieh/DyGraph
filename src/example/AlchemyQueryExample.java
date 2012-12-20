@@ -11,7 +11,7 @@ import java.net.URLEncoder;
 
 public class AlchemyQueryExample {
 
-	final static public String API_KEY = "d9c63c6528360164c610975a091d4eda26d55be5";
+	final static public String API_KEY = "[REDACTED]";
 	final static public String ENDPOINT = "http://access.alchemyapi.com/calls/text/TextGetRankedKeywords";
 	final static public String PARAMS = "?apikey=" + API_KEY + "&keywordExtractMode=strict&text=";
 	
